@@ -1,37 +1,56 @@
 import React from 'react';
 import {
   MdHome,
-  MdAddShoppingCart,
-  MdTableView,
   MdGroup,
+  MdAttachMoney, // Used for Cash In / Cash Out
+  MdBusiness, // Used for Company
+  MdWork, // Used for Employee
+  MdAssignment, // Used for Project
+  MdLocalShipping, // Used for Vendor
+  MdRemoveShoppingCart, // Alternative for Cash Out if needed, but MdAttachMoney is used for consistency
 } from "react-icons/md";
 
 const menuItems = () => {
   return [
     {
-      title: "Search",
-      path: "/dashboard/search",
-      icon: <MdHome className="text-lg" />, // Home is okay for Search
-    },
-        {
-      title: "Categorie",
-      path: "/dashboard/categorie",
-      icon: <MdAddShoppingCart className="text-lg" />, // Cart icon for adding products
-    },
-    {
-      title: "Add Product",
-      path: "/dashboard/add",
-      icon: <MdAddShoppingCart className="text-lg" />, // Cart icon for adding products
-    },
-    {
-      title: "View Product",
-      path: "/dashboard/view",
-      icon: <MdTableView className="text-lg" />, // Table view for viewing list
+      title: "Dashboard",
+      path: "/dashboard/home",
+      icon: <MdHome className="text-lg" />,
     },
     {
       title: "Staff",
       path: "/dashboard/users",
-      icon: <MdGroup className="text-lg" />, // People icon for staff
+      icon: <MdGroup className="text-lg" />,
+    },
+    {
+      title: "Cash In",
+      path: "/dashboard/cashIn",
+      icon: <MdAttachMoney className="text-lg" />, // Cash In
+    },
+    {
+      title: "Cash Out",
+      path: "/dashboard/cashout",
+      icon: <MdAttachMoney className="text-lg" />, // Cash Out (using same icon, or could use MdRemoveShoppingCart)
+    },
+    {
+      title: "Company",
+      path: "/dashboard/company",
+      icon: <MdBusiness className="text-lg" />, // Company/Business
+    },
+    {
+      title: "Employee",
+      path: "/dashboard/employee",
+      icon: <MdWork className="text-lg" />, // Work/Employee
+    },
+    {
+      title: "Project",
+      path: "/dashboard/project",
+      icon: <MdAssignment className="text-lg" />, // Project/Assignment
+    },
+    {
+      title: "Vendor",
+      path: "/dashboard/vendor",
+      icon: <MdLocalShipping className="text-lg" />, // Shipping/Vendor
     },
   ];
 };

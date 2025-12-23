@@ -4,9 +4,12 @@ import React, { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Header from "./../../components/Header";
+import useThemeMode from "../../Hook/useThemeMode"; 
 
 const ARoot = () => {
-  // State to manage sidebar visibility
+
+  const { mode } = useThemeMode(); 
+
   const [isSidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
 
   const toggleSidebar = () => {
@@ -27,23 +30,39 @@ const ARoot = () => {
     // Cleanup the event listener on component unmount
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  return (
-    <div className="flex h-screen bg-gray-100">
-      <Sidebar isSidebarOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-
-      <div
-        className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ${
-          isSidebarOpen ? "md:ml-64" : "md:ml-20"
-        }`}
-      >
   
+  // 💡 Define theme-dependent classes for the main wrapper
+  const mainWrapperClasses = `
+    flex h-screen transition-colors duration-300
+    ${mode === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}
+  `;
+
+  const contentMainClasses = `
+    flex-1 flex flex-col overflow-hidden transition-all duration-300
+    ${isSidebarOpen ? "md:ml-64" : "md:ml-20"}
+  `;
+  
+  // 💡 Apply the theme classes to the top-level div
+  return (
+    <div className={mainWrapperClasses}>
+      {/* Sidebar is now passed the 'mode' for internal styling */}
+      <Sidebar 
+        isSidebarOpen={isSidebarOpen} 
+        toggleSidebar={toggleSidebar} 
+        mode={mode} // 💡 Pass mode to the Sidebar
+      />
+
+      <div className={contentMainClasses}>
+ 
         <Header 
           isSidebarOpen={isSidebarOpen} 
           toggleSidebar={toggleSidebar} 
         />
         
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 md:p-6">
+        {/* The main content area also needs theme-dependent styling */}
+        <main className={`flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6 transition-colors duration-300 
+          ${mode === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}
+        `}>
           <Outlet />
         </main>
       </div>

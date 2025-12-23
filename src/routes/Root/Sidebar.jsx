@@ -5,18 +5,38 @@ import { Link, useLocation } from "react-router-dom";
 import { MdChevronRight } from "react-icons/md";
 import menuItems from "./MenuItems";
 
-import Logo from "../../assets/Logo/logo.png"
-// The AccordionItem component remains the same.
-const AccordionItem = ({ item, isSidebarOpen }) => {
+// 💡 Import both logo versions
+import Logo from "../../assets/Logo/logo.png";
+import Logo_Dark from "../../assets/Logo/logo_dark.png"; 
+
+
+const AccordionItem = ({ item, isSidebarOpen, mode }) => {
     const [isOpen, setIsOpen] = useState(false);
     const location = useLocation();
+
+
+    const getLinkClasses = (path) => {
+        const baseClasses = "flex p-3 my-1 rounded-md gap-3 items-center transition-colors";
+
+        // ✅ REINSTATED DARK MODE HOVER/TEXT
+        // Text is base-content (light) or gray-300 (dark). Hover is base-content/10 (light) or gray-700 (dark).
+        const textHoverClasses = "text-base-content dark:text-gray-300 hover:bg-base-content/10 dark:hover:bg-gray-700";
+        
+        if (location.pathname === path) {
+            // Active link uses primary (your green)
+            return `bg-primary text-white ${baseClasses}`;
+        }
+        
+        return `${textHoverClasses} ${baseClasses}`;
+    };
 
     if (item.list) {
         return (
             <li className="my-1">
                 <button
                     onClick={() => setIsOpen(!isOpen)}
-                    className="w-full flex justify-between items-center p-3 rounded-md text-gray-600 hover:bg-gray-200"
+                    // ✅ REINSTATED DARK MODE HOVER/TEXT
+                    className="w-full flex justify-between items-center p-3 rounded-md text-base-content dark:text-gray-300 hover:bg-base-content/10 dark:hover:bg-gray-700 transition-colors"
                 >
                     <div className="flex items-center gap-3">
                         {item.icon}
@@ -32,8 +52,9 @@ const AccordionItem = ({ item, isSidebarOpen }) => {
                                     to={child.path}
                                     className={`flex p-2 my-1 text-sm rounded-md gap-3 items-center transition-colors ${
                                         location.pathname === child.path
-                                            ? "bg-blue-500 text-white"
-                                            : "text-gray-500 hover:bg-gray-200"
+                                            ? "bg-primary text-white"
+                                            // ✅ REINSTATED DARK MODE HOVER/TEXT
+                                            : "text-base-content/70 dark:text-gray-400 hover:bg-base-content/10 dark:hover:bg-gray-700"
                                     }`}
                                 >
                                     {child.icon}
@@ -50,11 +71,7 @@ const AccordionItem = ({ item, isSidebarOpen }) => {
             <li>
                 <Link
                     to={item.path}
-                    className={`flex p-3 my-1 rounded-md gap-3 items-center transition-colors ${
-                        location.pathname === item.path
-                            ? "bg-blue-500 text-white"
-                            : "text-gray-600 hover:bg-gray-200"
-                    }`}
+                    className={getLinkClasses(item.path)}
                 >
                     {item.icon}
                     {isSidebarOpen && <span className="font-medium text-sm">{item.title}</span>}
@@ -65,8 +82,20 @@ const AccordionItem = ({ item, isSidebarOpen }) => {
 };
 
 
-// FIX APPLIED TO THE MAIN SIDEBAR COMPONENT
-const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
+const Sidebar = ({ isSidebarOpen, toggleSidebar, mode }) => {
+    
+    // ✅ FIX: Use base-100 for light mode, and dark:bg-gray-800 for explicit dark mode background
+    const sidebarClasses = `
+        fixed top-0 left-0 h-full shadow-lg z-30 transition-all duration-300 flex flex-col
+        bg-base-100 dark:bg-gray-800 
+        ${isSidebarOpen
+            ? 'w-64 translate-x-0' 
+            : 'w-64 -translate-x-full md:w-20 md:translate-x-0'
+        }
+    `;
+
+    // 💡 LOGIC FOR DYNAMIC LOGO SWITCHING
+    const currentLogo = mode === 'dark' ? Logo_Dark : Logo;
 
 
     return (
@@ -79,23 +108,27 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
 
             {/* Sidebar Container */}
             <div
-                className={`fixed top-0 left-0 h-full bg-white shadow-lg z-30 transition-all duration-300 flex flex-col
-                    ${isSidebarOpen
-                        ? 'w-64 translate-x-0' // Is OPEN on mobile and desktop
-                        : 'w-64 -translate-x-full md:w-20 md:translate-x-0' // Is CLOSED
-                    }`
-                }
+                className={sidebarClasses} 
             >
-                {/* Logo */}
-                <div className="flex items-center justify-center p-8 border-b h-[65px] flex-shrink-0 my-5">
-                    <img src={Logo} alt="Logo" className={`transition-all duration-300 ${isSidebarOpen ? 'w-24' : 'w-10'}`} />
+           
+                <div className={`flex items-center justify-center p-8 border-b h-[65px] flex-shrink-0 my-5 transition-colors duration-300 
+                    // ✅ REINSTATED DARK MODE BORDER COLOR
+                    border-base-content/10 dark:border-gray-700 
+                `}>
+                    {/* 💡 Use the dynamically selected logo based on the 'mode' state */}
+                    <img src={currentLogo} alt="Logo" className={`transition-all duration-300 ${isSidebarOpen ? 'w-24' : 'w-10'}`} />
                 </div>
 
                 {/* Menu */}
                 <nav className="flex-1 overflow-y-auto p-2">
                     <ul>
                         {menuItems().map((item) => (
-                            <AccordionItem key={item.title} item={item} isSidebarOpen={isSidebarOpen} />
+                            <AccordionItem 
+                                key={item.title} 
+                                item={item} 
+                                isSidebarOpen={isSidebarOpen} 
+                                mode={mode} 
+                            />
                         ))}
                     </ul>
                 </nav>

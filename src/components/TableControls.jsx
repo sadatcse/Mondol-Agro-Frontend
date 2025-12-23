@@ -1,44 +1,30 @@
 import React from 'react';
 
-const TableControls = ({ itemsPerPage, onItemsPerPageChange, searchTerm, onSearchChange }) => {
-    return (
-        <div className="flex flex-col md:flex-row justify-between items-center mb-4 space-y-4 md:space-y-0">
-            {/* Items per page selector */}
-            <div className="flex items-center w-full md:w-auto">
-                <span className="text-sm text-gray-700 mr-2">Show</span>
-                <select
-                    value={itemsPerPage}
-                    onChange={onItemsPerPageChange}
-                    className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                >
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                </select>
-                <span className="text-sm text-gray-700 ml-2">entries</span>
-            </div>
-
-            {/* Search input */}
-            <div className="flex items-center w-full md:w-auto">
-                <label htmlFor="table-search" className="sr-only">Search</label>
-                <div className="relative w-full">
-                    <div className="absolute inset-y-0 left-0 flex items-center ps-3 pointer-events-none">
-                        <svg className="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                        </svg>
-                    </div>
-                    <input
-                        type="text"
-                        id="table-search"
-                        placeholder="Search for items"
-                        value={searchTerm}
-                        onChange={onSearchChange}
-                        className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-full md:w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                </div>
-            </div>
-        </div>
-    );
-};
+const TableControls = ({ itemsPerPage, onItemsPerPageChange, searchTerm, onSearchChange }) => (
+  <div className="flex flex-col md:flex-row justify-between items-center gap-3">
+    <div className="flex items-center gap-2">
+      <span className="text-sm text-gray-700">Show</span>
+      <select
+        value={itemsPerPage}
+        onChange={onItemsPerPageChange}
+        className="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+      >
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="20">20</option>
+      </select>
+      <span className="text-sm text-gray-700">entries</span>
+    </div>
+    <div className="relative w-full md:w-80">
+      <input
+        type="text"
+        placeholder="Search"
+        value={searchTerm}
+        onChange={onSearchChange}
+        className="block p-2 ps-3 text-sm border border-gray-300 rounded-lg w-full bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+      />
+    </div>
+  </div>
+);
 
 export default TableControls;

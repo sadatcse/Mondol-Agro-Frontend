@@ -6,10 +6,14 @@ import Root from "./Root/Root";
 import Users from "../pages/OtherPage/users";
 import PrivateRoot from "./Root/PrivateRoot";
 import Aroot from "./Root/Aroot";
-import ViewProduct from './../pages/Product/ViewProduct';
-import AddProduct from './../pages/Product/AddProduct';
-import SearchProduct from '../pages/Product/SearchProduct';
-import Categorie from "../pages/Product/Categorie";
+import Home from "../pages/Dashboard/Home";
+import CashIn from "../pages/Main/CashIn";
+import Vendor from "../pages/Main/Vendor";
+import Project from "../pages/Main/Project";
+import Employee from "../pages/Main/Employee";
+import Company from "../pages/Main/Company";
+import Cashout from "../pages/Main/Cashout";
+
 
 
 
@@ -34,32 +38,42 @@ export const router = createBrowserRouter([
         path: "",
         element: (
           <PrivateRoot>
-            <Navigate to="search" replace />
+            <Navigate to="home" replace />
           </PrivateRoot>
         ),
       },
       {
-        path: "search",
-        element: <PrivateRoot><SearchProduct /></PrivateRoot>,
-      },
-      {
-        path: "categorie",
-        element: <PrivateRoot><Categorie /></PrivateRoot>,
-      },
-      {
-        path: "add",
-        element: <PrivateRoot><AddProduct /></PrivateRoot>,
-      },
-
-      {
-        path: "view",
-        element: <PrivateRoot><ViewProduct /></PrivateRoot>,
+        path: "home",
+        element: <PrivateRoot><Home /></PrivateRoot>,
       },
       {
         path: "users",
         element: <PrivateRoot><Users /></PrivateRoot>,
       },
-
+         {
+        path: "cashout",
+        element: <PrivateRoot><Cashout /></PrivateRoot>,
+      },
+         {
+        path: "company",
+        element: <PrivateRoot><Company /></PrivateRoot>,
+      },
+         {
+        path: "employee",
+        element: <PrivateRoot><Employee /></PrivateRoot>,
+      },
+         {
+        path: "project",
+        element: <PrivateRoot><Project /></PrivateRoot>,
+      },
+         {
+        path: "vendor",
+        element: <PrivateRoot><Vendor /></PrivateRoot>,
+      },
+               {
+        path: "cashIn",
+        element: <PrivateRoot><CashIn /></PrivateRoot>,
+      },
     ],
   },
 ]);
