@@ -19,6 +19,19 @@ export const useAttendance = () => {
     }
   }, [axiosSecure]);
 
+  const getMyAttendanceHistory = useCallback(async (employeeId, date) => {
+    setLoading(true);
+    try {
+      // date format should be "YYYY-MM"
+      const { data } = await axiosSecure.get(`/attendance/my-history/${employeeId}?date=${date}`);
+      return data;
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [axiosSecure]);
+
   const createAttendance = async (data) => {
     setLoading(true);
     try {
@@ -69,6 +82,7 @@ export const useAttendance = () => {
     getPaginatedAttendances,
     createAttendance,
     updateAttendance,
+    getMyAttendanceHistory,
     removeAttendance,
     getAttendanceReport,
     bulkCreateAttendance

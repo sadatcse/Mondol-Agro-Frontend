@@ -1,9 +1,9 @@
 import React from 'react';
-
+import Employeedirectory from '../Report/Employeedirectory';
 const Directory = () => {
     return (
         <div>
-                 <h1>Directory</h1>
+                <Employeedirectory/>
         </div>
     );
 };
