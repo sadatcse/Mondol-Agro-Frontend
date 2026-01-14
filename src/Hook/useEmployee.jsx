@@ -75,6 +75,18 @@ export const useEmployee = () => {
     }
   };
 
+  const getDirectoryEmployees = useCallback(async (params) => {
+    setLoading(true);
+    try {
+      const { data } = await axiosSecure.get('/employee/directory-list', { params });
+      return data;
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [axiosSecure]);
+
   // --- PAGINATION ---
   const getPaginatedEmployees = useCallback(async (params) => {
     setLoading(true);
@@ -96,6 +108,7 @@ export const useEmployee = () => {
     createEmployee,
     updateEmployee,
     removeEmployee,
+    getDirectoryEmployees,
     getPaginatedEmployees
   };
 };

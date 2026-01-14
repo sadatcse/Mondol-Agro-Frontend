@@ -12,6 +12,7 @@
     "cra-template": "1.2.0",
     "daisyui": "^4.12.23",
     "dom-to-image": "^2.6.0",
+    "file-saver": "^2.0.5",
     "firebase": "^11.2.0",
     "framer-motion": "^11.18.2",
     "from": "^0.1.7",
@@ -43,13 +44,15 @@
     "react-router-dom": "^7.1.2",
     "react-scripts": "5.0.1",
     "react-scroll": "^1.9.0",
+    "react-to-print": "^3.2.0",
     "react-toastify": "^11.0.3",
     "recharts": "^2.15.0",
     "sass": "^1.83.4",
     "sass-loader": "^16.0.4",
     "sort-by": "^1.2.0",
     "sweetalert2": "^11.15.10",
-    "web-vitals": "^4.2.4"
+    "web-vitals": "^4.2.4",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "start": "react-scripts start",

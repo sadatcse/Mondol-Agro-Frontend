@@ -3,6 +3,7 @@ import UseAxiosSecure from "../../Hook/UseAxioSecure";
 import SkeletonLoader from "../../components/SkeletonLoader";
 import TableControls from "../../components/TableControls";
 import ImageUpload from "../../config/ImageUploadcpanel";
+import useDistricts from "../../Hook/useDistricts"; // Import District Hook
 import { 
   FaEdit, FaTrash, FaPlus, FaGlobe, FaEnvelope, FaTimes, 
   FaBuilding, FaSave, FaPhone, FaMapMarkerAlt, FaIdCard, FaUserTie, FaBriefcase,
@@ -13,6 +14,7 @@ import Swal from "sweetalert2";
 
 const Company = () => {
   const axiosSecure = UseAxiosSecure();
+  const { districts } = useDistricts(); // Use District Hook
 
   // Logic States
   const [companies, setCompanies] = useState([]);
@@ -35,17 +37,19 @@ const Company = () => {
     tinNumber: "",
     binNumber: "",
     registeredAddress: "",
-    city: "",
+    city: "", // Integrated with District dropdown
     managingDirectorName: "",
     contactPhone: "",
     companyEmail: "",
     website: "",
     businessNature: "",
     logo: "",
+    role: "user",
   };
 
   const [formData, setFormData] = useState(initialForm);
 
+  // --- API FETCHING ---
   const fetchCompanies = useCallback(async () => {
     setLoading(true);
     try {
@@ -68,11 +72,11 @@ const Company = () => {
 
   useEffect(() => { fetchCompanies(); }, [fetchCompanies]);
 
-  // Reset to page 1 when searching
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, itemsPerPage]);
 
+  // --- HANDLERS ---
   const handleOpenModal = (company = null) => {
     if (company) {
       setEditingId(company._id);
@@ -138,7 +142,7 @@ const Company = () => {
 
   return (
     <div className="p-6 bg-base-200 min-h-screen">
-      {/* --- HEADER --- */}
+      {/* HEADER */}
       <div className="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-sm mb-6 border-l-8 border-primary">
         <div>
           <h1 className="text-3xl font-black text-secondary flex items-center gap-2">
@@ -151,7 +155,7 @@ const Company = () => {
         </button>
       </div>
 
-      {/* --- DATA TABLE --- */}
+      {/* DATA TABLE */}
       <div className="bg-base-100 rounded-2xl shadow-sm border border-base-300">
         <div className="p-4 bg-base-50/50">
           <TableControls
@@ -167,7 +171,7 @@ const Company = () => {
             <thead>
               <tr className="text-secondary uppercase text-xs tracking-widest bg-base-200/50">
                 <th>Legal Identity</th>
-                <th>Managing Director</th>
+                <th>MD / Location</th>
                 <th>Type / Group</th>
                 <th>Tax Details</th>
                 <th className="text-center">Actions</th>
@@ -180,7 +184,7 @@ const Company = () => {
                 <tr><td colSpan="5" className="text-center py-10 opacity-50 font-bold">No companies found.</td></tr>
               ) : (
                 companies.map((c) => (
-                  <tr key={c._id} className="hover:bg-primary/5 transition-colors">
+                  <tr key={c._id} className="hover:bg-primary/5 transition-colors border-b border-base-200">
                     <td>
                       <div className="flex items-center gap-3">
                         <div className="mask mask-squircle w-12 h-12 bg-white border p-1 shadow-inner flex items-center justify-center">
@@ -188,27 +192,28 @@ const Company = () => {
                         </div>
                         <div>
                           <div className="font-bold text-secondary text-base">{c.companyName}</div>
-                          <div className="text-xs opacity-60 flex items-center gap-1"> {Array.isArray(c.businessNature) ? c.businessNature.join(" • ") : "No Nature Defined"}</div>
+                          <div className="text-xs opacity-60 flex items-center gap-1 font-medium"> {Array.isArray(c.businessNature) ? c.businessNature.join(" • ") : "No Nature Defined"}</div>
                         </div>
                       </div>
                     </td>
                     <td>
                       <div className="text-sm font-semibold flex items-center gap-1 text-secondary"><FaUserTie className="text-primary text-xs"/> {c.managingDirectorName || "N/A"}</div>
+                      <div className="text-[10px] flex items-center gap-1 mt-1 opacity-70 font-bold"><FaMapMarkerAlt className="text-primary"/> {c.city || "N/A"}</div>
                     </td>
                     <td>
-                      <div className="badge badge-primary badge-outline font-bold text-[10px] mb-1">{c.companyType}</div>
-                      <div className="text-xs block italic text-neutral-400">{c.parentGroupName}</div>
+                      <div className="badge badge-primary badge-outline font-black text-[9px] mb-1">{c.companyType}</div>
+                      <div className="text-[11px] block italic text-neutral-400 font-medium">{c.parentGroupName}</div>
                     </td>
                     <td>
                       <div className="space-y-1">
-                        <span className="text-[10px] font-mono bg-base-200 px-2 py-0.5 rounded block w-fit">BIN: {c.binNumber || "N/A"}</span>
-                        <span className="text-[10px] font-mono bg-primary/10 text-primary px-2 py-0.5 rounded block w-fit">TIN: {c.tinNumber || "N/A"}</span>
+                        <span className="text-[10px] font-mono bg-base-200 px-2 py-0.5 rounded block w-fit font-bold">BIN: {c.binNumber || "N/A"}</span>
+                        <span className="text-[10px] font-mono bg-primary/10 text-primary px-2 py-0.5 rounded block w-fit font-bold">TIN: {c.tinNumber || "N/A"}</span>
                       </div>
                     </td>
                     <td className="text-center">
                       <div className="flex justify-center gap-1">
-                        <button onClick={() => handleOpenModal(c)} className="btn btn-sm btn-circle btn-ghost text-info hover:bg-info/10"><FaEdit className="text-primary" /></button>
-                        <button onClick={() => handleDelete(c._id)} className="btn btn-sm btn-circle btn-ghost text-error hover:bg-error/10"><FaTrash className="text-red-500" /></button>
+                        <button onClick={() => handleOpenModal(c)} className="btn btn-sm btn-circle btn-ghost text-info hover:bg-info/10"><FaEdit className="text-primary text-lg" /></button>
+                        <button onClick={() => handleDelete(c._id)} className="btn btn-sm btn-circle btn-ghost text-error hover:bg-error/10"><FaTrash className="text-red-500 text-lg" /></button>
                       </div>
                     </td>
                   </tr>
@@ -218,52 +223,33 @@ const Company = () => {
           </table>
         </div>
 
-        {/* --- PERFECT PAGINATION FOOTER --- */}
+        {/* PAGINATION */}
         <div className="p-4 flex flex-col md:flex-row justify-between items-center gap-4 bg-base-50 rounded-b-2xl border-t">
           <div className="text-sm font-medium text-neutral-500">
             Showing <span className="text-secondary font-bold">{companies.length}</span> of <span className="text-secondary font-bold">{totalItems}</span> companies
           </div>
           
           <div className="join shadow-sm border border-base-300 bg-white">
-            <button 
-              className="join-item btn btn-sm bg-white hover:bg-base-200 border-none"
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(prev => prev - 1)}
-            >
+            <button className="join-item btn btn-sm bg-white" disabled={currentPage === 1} onClick={() => setCurrentPage(prev => prev - 1)}>
               <FaChevronLeft className="text-xs" />
             </button>
-            
-            {[...Array(totalPages)].map((_, index) => {
-                const pageNum = index + 1;
-                // Basic logic to show limited page buttons if totalPages is huge
-                if (totalPages > 5 && (pageNum < currentPage - 1 || pageNum > currentPage + 1) && pageNum !== 1 && pageNum !== totalPages) {
-                    if (pageNum === currentPage - 2 || pageNum === currentPage + 2) return <button key={pageNum} className="join-item btn btn-sm btn-disabled bg-white border-none">...</button>;
-                    return null;
-                }
-                
-                return (
-                    <button
-                        key={pageNum}
-                        onClick={() => setCurrentPage(pageNum)}
-                        className={`join-item btn btn-sm border-none ${currentPage === pageNum ? "btn-primary text-white" : "bg-white hover:bg-base-200"}`}
-                    >
-                        {pageNum}
-                    </button>
-                );
-            })}
-
-            <button 
-              className="join-item btn btn-sm bg-white hover:bg-base-200 border-none"
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage(prev => prev + 1)}
-            >
+            {[...Array(totalPages)].map((_, index) => (
+              <button
+                key={index + 1}
+                onClick={() => setCurrentPage(index + 1)}
+                className={`join-item btn btn-sm border-none ${currentPage === index + 1 ? "btn-primary text-white" : "bg-white text-neutral-500"}`}
+              >
+                {index + 1}
+              </button>
+            ))}
+            <button className="join-item btn btn-sm bg-white" disabled={currentPage === totalPages} onClick={() => setCurrentPage(prev => prev + 1)}>
               <FaChevronRight className="text-xs" />
             </button>
           </div>
         </div>
       </div>
 
-      {/* --- FORM MODAL (Unchanged but ensuring it stays in scope) --- */}
+      {/* FORM MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-base-100 rounded-3xl w-full max-w-6xl max-h-[95vh] overflow-hidden shadow-2xl flex flex-col border-t-8 border-primary">
@@ -280,7 +266,7 @@ const Company = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 
                 {/* Section: Legal Identity */}
-                <div className="md:col-span-3 border-b pb-2"><h3 className="font-bold text-primary flex items-center gap-2"><FaIdCard /> Corporate Identity</h3></div>
+                <div className="md:col-span-3 border-b pb-2"><h3 className="font-bold text-primary flex items-center gap-2 uppercase tracking-wider text-sm"><FaIdCard /> Corporate Identity</h3></div>
                 
                 <div className="form-control">
                   <label className="label-text font-bold mb-1">Company Full Name *</label>
@@ -303,7 +289,7 @@ const Company = () => {
                 </div>
 
                 {/* Section: Leadership & Nature */}
-                <div className="md:col-span-3 border-b pb-2 mt-4"><h3 className="font-bold text-primary flex items-center gap-2"><FaUserTie /> Governance & Operations</h3></div>
+                <div className="md:col-span-3 border-b pb-2 mt-4"><h3 className="font-bold text-primary flex items-center gap-2 uppercase tracking-wider text-sm"><FaUserTie /> Governance & Operations</h3></div>
                 
                 <div className="form-control">
                   <label className="label-text font-bold mb-1">Managing Director Name</label>
@@ -315,7 +301,7 @@ const Company = () => {
                 </div>
 
                 {/* Section: Legal Identifiers */}
-                <div className="md:col-span-3 border-b pb-2 mt-4"><h3 className="font-bold text-primary flex items-center gap-2"><FaBriefcase /> Legal Identifiers</h3></div>
+                <div className="md:col-span-3 border-b pb-2 mt-4"><h3 className="font-bold text-primary flex items-center gap-2 uppercase tracking-wider text-sm"><FaBriefcase /> Legal Identifiers</h3></div>
                 <div className="form-control">
                   <label className="label-text font-bold mb-1 text-xs">Reg Number</label>
                   <input className="input input-bordered input-sm" value={formData.registrationNumber} onChange={(e) => setFormData({...formData, registrationNumber: e.target.value})} />
@@ -330,7 +316,7 @@ const Company = () => {
                 </div>
 
                 {/* Section: Contact & Website */}
-                <div className="md:col-span-3 border-b pb-2 mt-4"><h3 className="font-bold text-primary flex items-center gap-2"><FaGlobe /> Connectivity</h3></div>
+                <div className="md:col-span-3 border-b pb-2 mt-4"><h3 className="font-bold text-primary flex items-center gap-2 uppercase tracking-wider text-sm"><FaGlobe /> Connectivity</h3></div>
                 <div className="form-control">
                   <label className="label-text font-bold mb-1">Company Email</label>
                   <input type="email" className="input input-bordered" value={formData.companyEmail} onChange={(e) => setFormData({...formData, companyEmail: e.target.value})} />
@@ -344,14 +330,27 @@ const Company = () => {
                   <input className="input input-bordered" placeholder="https://..." value={formData.website} onChange={(e) => setFormData({...formData, website: e.target.value})} />
                 </div>
 
-                {/* Section: Address */}
+                {/* Section: Address - Integrated City Dropdown */}
                 <div className="md:col-span-2">
-                  <label className="label-text font-bold mb-1">Registered Address</label>
-                  <input className="input input-bordered w-full" value={formData.registeredAddress} onChange={(e) => setFormData({...formData, registeredAddress: e.target.value})} />
+                  <label className="label-text font-bold mb-1 flex items-center gap-2"><FaMapMarkerAlt className="text-primary"/> Registered Address</label>
+                  <input className="input input-bordered w-full" value={formData.registeredAddress} onChange={(e) => setFormData({...formData, registeredAddress: e.target.value})} placeholder="House, Road, Area..." />
                 </div>
+
                 <div className="form-control">
-                  <label className="label-text font-bold mb-1">City</label>
-                  <input className="input input-bordered" value={formData.city} onChange={(e) => setFormData({...formData, city: e.target.value})} />
+                  <label className="label-text font-bold mb-1 flex items-center gap-2">City/District *</label>
+                  <select 
+                    required 
+                    className="select select-bordered w-full" 
+                    value={formData.city} 
+                    onChange={(e) => setFormData({...formData, city: e.target.value})}
+                  >
+                    <option value="">Select City</option>
+                    {districts.map((dist) => (
+                      <option key={dist.id || dist.district} value={dist.district}>
+                        {dist.district}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="md:col-span-3 bg-base-200/50 p-6 rounded-2xl">

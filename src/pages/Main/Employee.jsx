@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useEmployee } from "../../Hook/useEmployee";
 import { useCompany } from "../../Hook/useCompany";
+import { useDepartment } from "../../Hook/useDepartment"; // Added
+import { useDesignation } from "../../Hook/useDesignation"; // Added
+import useDistricts from "../../Hook/useDistricts";
 import SkeletonLoader from "../../components/SkeletonLoader";
 import TableControls from "../../components/TableControls";
 import ImageUpload from "../../config/ImageUploadcpanel";
@@ -8,24 +11,33 @@ import {
   FaEdit, FaTrash, FaPlus, FaTimes, FaSave, FaUserTie, 
   FaIdCard, FaBriefcase, FaEnvelope, FaPhone, FaMapMarkerAlt,
   FaFacebook, FaLinkedin, FaUsers, FaChevronLeft, FaChevronRight,
-  FaCalendarAlt, FaMoneyBillWave, FaShieldAlt, FaBuilding
+  FaCalendarAlt, FaMoneyBillWave, FaShieldAlt, FaBuilding, FaInfoCircle,
+  FaCreditCard,
+  FaUniversity
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
+import useBanks from "../../Hook/useBanks";
 
 const Employee = () => {
   const { getPaginatedEmployees, createEmployee, updateEmployee, removeEmployee } = useEmployee();
   const { getAllCompanies } = useCompany();
+  const { getAllDepartments } = useDepartment(); 
+  const { getAllDesignations } = useDesignation(); 
+  const { districts } = useDistricts();
+  const { banks: bankList } = useBanks();
 
-  // Logic States
+  
   const [employees, setEmployees] = useState([]);
   const [companies, setCompanies] = useState([]);
+  const [departments, setDepartments] = useState([]); 
+  const [designations, setDesignations] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Table & Filter States
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCompany, setSelectedCompany] = useState(""); // NEW: Filter State
+  const [selectedCompany, setSelectedCompany] = useState(""); 
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -41,25 +53,39 @@ const Employee = () => {
     currentSalary: "", fatherName: "", motherName: "", employeePhone: "",
     employeeEmail: "", employeeAddress: "", city: "", emergencyContactName: "",
     emergencyContactPhone: "", emergencyContactRelation: "", facebookProfile: "",
-    linkedinProfile: "",
+    linkedinProfile: "", status: "Active",bankInfo: {
+    bankName: "",
+    accountNumber: "",
+    branch: "",
+    routingNumber: "" 
+  },
   };
 
   const [formData, setFormData] = useState(initialForm);
 
-  // Fetch Companies for Filter and Dropdown
-  const fetchCompanies = useCallback(async () => {
-    const data = await getAllCompanies();
-    if (data) setCompanies(data);
-  }, [getAllCompanies]);
 
-  // Fetch Paginated Employees with Company Filter
+  const fetchDropdownData = useCallback(async () => {
+    try {
+      const [compData, deptData, desigData] = await Promise.all([
+        getAllCompanies(),
+        getAllDepartments(),
+        getAllDesignations()
+      ]);
+      if (compData) setCompanies(compData);
+      if (deptData) setDepartments(deptData);
+      if (desigData) setDesignations(desigData);
+    } catch (err) {
+      console.error("Error fetching dropdown lists", err);
+    }
+  }, [getAllCompanies, getAllDepartments, getAllDesignations]);
+
   const fetchEmployees = useCallback(async () => {
     setLoading(true);
     const data = await getPaginatedEmployees({ 
       page: currentPage, 
       limit: itemsPerPage, 
       search: searchTerm,
-      company: selectedCompany // NEW: Passed to API
+      company: selectedCompany 
     });
     if (data) {
       setEmployees(data.data);
@@ -71,97 +97,129 @@ const Employee = () => {
 
   useEffect(() => { 
     fetchEmployees(); 
-    fetchCompanies();
-  }, [fetchEmployees, fetchCompanies]);
+    fetchDropdownData();
+  }, [fetchEmployees, fetchDropdownData]);
 
-  // Reset to page 1 when filter changes
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedCompany, searchTerm]);
 
-  // --- VALIDATION LOGIC ---
+  // --- VALIDATION & UTILS ---
   const validateForm = () => {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = "Full Name is required";
-    if (!formData.employeeId.trim()) newErrors.employeeId = "Employee ID is required";
-    if (!formData.nationalIdCardName.trim()) newErrors.nationalIdCardName = "National ID is required";
     if (!formData.company) newErrors.company = "Please select a company";
-    if (!formData.currentSalary || formData.currentSalary <= 0) newErrors.currentSalary = "Valid salary is required";
-    if (!formData.employeePhone.trim()) {
-        newErrors.employeePhone = "Phone number is required";
-    } else if (!/^\d+$/.test(formData.employeePhone)) {
-        newErrors.employeePhone = "Phone must contain only numbers";
-    }
+    if (!formData.department) newErrors.department = "Please select a department";
+    if (!formData.designation) newErrors.designation = "Please select a designation";
+    if (!formData.employeePhone.trim()) newErrors.employeePhone = "Phone number is required";
+    if (!formData.employeeEmail.trim()) newErrors.employeeEmail = "Email is required";
+    if (!formData.employeeAddress.trim()) newErrors.employeeAddress = "Address is required";
+    if (!formData.city.trim()) newErrors.city = "City selection is required";
     
-    if (formData.employeeEmail && !/\S+@\S+\.\S+/.test(formData.employeeEmail)) {
-      newErrors.employeeEmail = "Invalid email format";
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleOpenModal = (employee = null) => {
-    setErrors({});
-    if (employee) {
-      setEditingId(employee._id);
-      setFormData({
-        ...employee,
-        company: employee.company?._id || employee.company,
-        joiningDate: employee.joiningDate ? new Date(employee.joiningDate).toISOString().split('T')[0] : ""
-      });
-    } else {
-      setEditingId(null);
-      setFormData(initialForm);
+  const getStatusClass = (status) => {
+    switch(status) {
+      case "Active": return "badge-success text-white";
+      case "Inactive": return "badge-warning text-white";
+      case "Resigned": return "badge-error text-white";
+      default: return "badge-ghost";
     }
-    setIsModalOpen(true);
   };
 
-  const handleDelete = async (id) => {
-    const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "Employee record will be removed!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
+const handleOpenModal = (employee = null) => {
+  setErrors({});
+  if (employee) {
+    setEditingId(employee._id);
+    setFormData({
+      ...employee,
+      company: employee.company?._id || employee.company || "",
+      department: employee.department?._id || employee.department || "",
+      designation: employee.designation?._id || employee.designation || "",
+      joiningDate: employee.joiningDate ? new Date(employee.joiningDate).toISOString().split('T')[0] : "",
+      status: employee.status || "Active",
+      // Map bankInfo including routingNumber
+      bankInfo: {
+        bankName: employee.bankInfo?.bankName || "",
+        accountNumber: employee.bankInfo?.accountNumber || "",
+        branch: employee.bankInfo?.branch || "",
+        routingNumber: employee.bankInfo?.routingNumber || "" // Added this
+      }
     });
+  } else {
+    setEditingId(null);
+    setFormData(initialForm);
+  }
+  setIsModalOpen(true);
+};
 
-    if (result.isConfirmed) {
-      try {
-        await removeEmployee(id);
-        toast.success("Employee deleted");
-        fetchEmployees();
-      } catch {
-        toast.error("Delete failed");
-      }
-    }
-  };
+const handleDelete = async (id) => {
+  const result = await Swal.fire({
+    title: "Are you sure?",
+    text: "This will delete the employee record and any existing login account.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    confirmButtonText: "Yes, delete",
+  });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) {
-        toast.error("Please fill in all required fields correctly");
-        return;
-    }
-
-    setIsSubmitting(true);
+  if (result.isConfirmed) {
     try {
-      if (editingId) {
-        await updateEmployee(editingId, formData);
-        toast.success("Employee updated!");
-      } else {
-        await createEmployee(formData);
-        toast.success("Employee onboarded!");
-      }
-      setIsModalOpen(false);
+      // Calling the useEmployee hook
+      const response = await removeEmployee(id);
+      toast.success(response.message);
       fetchEmployees();
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Operation failed");
-    } finally {
-      setIsSubmitting(false);
+      // If the user was available but failed to remove
+      const errorMsg = err.response?.data?.message || "Delete failed";
+      Swal.fire("Error", errorMsg, "error");
     }
-  };
+  }
+};
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!validateForm()) {
+    toast.error("Please fill in all required fields correctly.");
+    return;
+  }
+
+  setIsSubmitting(true);
+
+  try {
+    if (editingId) {
+      await updateEmployee(editingId, formData);
+      toast.success("Employee updated successfully!");
+    } else {
+      await createEmployee(formData);
+      toast.success("Employee onboarded successfully!");
+    }
+
+    setIsModalOpen(false);
+    fetchEmployees();
+  } catch (err) {
+    // Extract the message from the backend response
+    const serverMessage = err.response?.data?.message || err.response?.data?.error || "An unexpected error occurred.";
+    
+    // Check if the error is about a duplicate email to highlight the field
+    if (serverMessage.toLowerCase().includes("email")) {
+      setErrors(prev => ({ ...prev, employeeEmail: serverMessage }));
+    }
+
+    // Show a specific toast error
+    toast.error(serverMessage, {
+      duration: 5000,
+      position: "top-center"
+    });
+
+    console.error("Backend Error:", err.response?.data);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   const renderInput = (label, field, type = "text", required = false, icon = null) => (
     <div className="form-control">
@@ -183,7 +241,7 @@ const Employee = () => {
 
   return (
     <div className="p-6 bg-base-200 min-h-screen">
-      {/* --- HEADER --- */}
+      {/* HEADER SECTION */}
       <div className="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-sm mb-6 border-l-8 border-primary">
         <div>
           <h1 className="text-3xl font-black text-secondary flex items-center gap-2">
@@ -196,7 +254,7 @@ const Employee = () => {
         </button>
       </div>
 
-      {/* --- DATA TABLE --- */}
+      {/* TABLE SECTION */}
       <div className="bg-base-100 rounded-2xl shadow-sm border border-base-300">
         <div className="p-4 bg-base-50/50 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex-1 w-full">
@@ -208,7 +266,6 @@ const Employee = () => {
             />
           </div>
           
-          {/* NEW: Company Filter Dropdown */}
           <div className="flex items-center gap-2 w-full md:w-auto">
             <div className="form-control w-full md:w-64">
                 <div className="relative">
@@ -227,11 +284,6 @@ const Employee = () => {
                     </select>
                 </div>
             </div>
-            {selectedCompany && (
-                <button onClick={() => setSelectedCompany("")} className="btn btn-sm btn-ghost btn-circle text-error">
-                    <FaTimes />
-                </button>
-            )}
           </div>
         </div>
 
@@ -241,6 +293,7 @@ const Employee = () => {
               <tr className="text-secondary uppercase text-xs tracking-widest bg-base-200/50">
                 <th>Employee</th>
                 <th>Work Details</th>
+                <th>Status</th>
                 <th>Contact</th>
                 <th>Financials</th>
                 <th className="text-center">Actions</th>
@@ -248,12 +301,12 @@ const Employee = () => {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan="5"><SkeletonLoader /></td></tr>
+                <tr><td colSpan="6"><SkeletonLoader /></td></tr>
               ) : employees.length === 0 ? (
-                <tr><td colSpan="5" className="text-center py-10 opacity-50 font-bold">No employees found.</td></tr>
+                <tr><td colSpan="6" className="text-center py-10 opacity-50 font-bold">No employees found.</td></tr>
               ) : (
                 employees.map((emp) => (
-                  <tr key={emp._id} className="hover:bg-primary/5 transition-colors">
+                  <tr key={emp._id} className="hover:bg-primary/5 transition-colors border-b border-base-200">
                     <td>
                       <div className="flex items-center gap-3">
                         <div className="avatar">
@@ -264,28 +317,33 @@ const Employee = () => {
                         <div>
                           <div className="font-bold text-secondary">{emp.name}</div>
                           <div className="text-xs opacity-60">ID: {emp.employeeId}</div>
-                          <div className="text-[10px] bg-primary/10 text-primary px-1 rounded inline-block font-semibold">
+                          <div className="text-[10px] bg-primary/10 text-primary px-1 rounded inline-block font-bold">
                             {emp.company?.companyName || "N/A"}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td>
-                      <div className="text-sm font-semibold">{emp.designation || 'N/A'}</div>
-                      <div className="text-xs opacity-60">{emp.department || 'N/A'}</div>
-                      <div className="text-[10px] italic">Joined: {emp.joiningDate ? new Date(emp.joiningDate).toLocaleDateString() : 'N/A'}</div>
+                      {/* Note: In table display, we show the .name property of the populated object */}
+                      <div className="text-sm font-bold">{emp.designation?.name || emp.designation || 'N/A'}</div>
+                      <div className="text-xs opacity-60">{emp.department?.name || emp.department || 'N/A'}</div>
                     </td>
                     <td>
-                      <div className="text-xs flex items-center gap-1"><FaEnvelope className="text-[10px] text-primary"/> {emp.employeeEmail}</div>
-                      <div className="text-xs flex items-center gap-1 mt-1"><FaPhone className="text-[10px] text-primary"/> {emp.employeePhone}</div>
+                      <span className={`badge badge-sm font-bold p-3 ${getStatusClass(emp.status)}`}>
+                        {emp.status || "Active"}
+                      </span>
                     </td>
                     <td>
-                      <div className="font-mono font-bold text-success">${emp.currentSalary}</div>
+                      <div className="text-xs flex items-center gap-1 font-medium"><FaEnvelope className="text-[10px] text-primary"/> {emp.employeeEmail}</div>
+                      <div className="text-xs flex items-center gap-1 mt-1 font-medium"><FaPhone className="text-[10px] text-primary"/> {emp.employeePhone}</div>
+                    </td>
+                    <td>
+                      <div className="font-mono font-black text-success text-sm">${emp.currentSalary?.toLocaleString()}</div>
                     </td>
                     <td className="text-center">
                       <div className="flex justify-center gap-1">
-                        <button onClick={() => handleOpenModal(emp)} className="btn btn-sm btn-circle btn-ghost text-info"><FaEdit className="text-primary" /></button>
-                        <button onClick={() => handleDelete(emp._id)} className="btn btn-sm btn-circle btn-ghost text-error"><FaTrash className="text-red-500" /></button>
+                        <button onClick={() => handleOpenModal(emp)} className="btn btn-sm btn-circle btn-ghost text-info"><FaEdit className="text-primary text-lg" /></button>
+                        <button onClick={() => handleDelete(emp._id)} className="btn btn-sm btn-circle btn-ghost text-error"><FaTrash className="text-red-500 text-lg" /></button>
                       </div>
                     </td>
                   </tr>
@@ -295,7 +353,7 @@ const Employee = () => {
           </table>
         </div>
 
-        {/* --- PAGINATION FOOTER --- */}
+        {/* PAGINATION FOOTER */}
         <div className="p-4 flex flex-col md:flex-row justify-between items-center gap-4 bg-base-50 rounded-b-2xl border-t">
           <div className="text-sm font-medium text-neutral-500">
             Showing <span className="text-secondary font-bold">{employees.length}</span> of <span className="text-secondary font-bold">{totalItems}</span> employees
@@ -309,7 +367,7 @@ const Employee = () => {
               <button
                 key={index + 1}
                 onClick={() => setCurrentPage(index + 1)}
-                className={`join-item btn btn-sm border-none ${currentPage === index + 1 ? "btn-primary text-white" : "bg-white"}`}
+                className={`join-item btn btn-sm border-none ${currentPage === index + 1 ? "btn-primary text-white" : "bg-white text-neutral-500"}`}
               >
                 {index + 1}
               </button>
@@ -321,7 +379,7 @@ const Employee = () => {
         </div>
       </div>
 
-      {/* --- FORM MODAL --- */}
+      {/* FORM MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-base-100 rounded-3xl w-full max-w-6xl max-h-[95vh] overflow-hidden shadow-2xl flex flex-col border-t-8 border-primary">
@@ -337,17 +395,34 @@ const Employee = () => {
             <form onSubmit={handleSubmit} className="p-8 overflow-y-auto">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 
-                <div className="md:col-span-4 border-b pb-2"><h3 className="font-bold text-primary flex items-center gap-2"><FaIdCard /> Primary Information</h3></div>
+                {/* SECTION: Primary Info */}
+                <div className="md:col-span-4 border-b pb-2 flex justify-between items-center">
+                    <h3 className="font-bold text-primary flex items-center gap-2 uppercase tracking-wider"><FaIdCard /> Primary Information</h3>
+                    <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-black opacity-50 uppercase">Status:</span>
+                        <select 
+                            className={`select select-xs select-bordered font-bold rounded-full ${getStatusClass(formData.status)}`}
+                            value={formData.status}
+                            onChange={(e) => setFormData({...formData, status: e.target.value})}
+                        >
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Resigned">Resigned</option>
+                        </select>
+                    </div>
+                </div>
                 
                 {renderInput("Full Name", "name", "text", true)}
                 {renderInput("Employee ID", "employeeId", "text", true)}
                 {renderInput("RFID Number", "rfidNumber")}
-                {renderInput("National ID", "nationalIdCardName", "text", true)}
+                {renderInput("National ID Name", "nationalIdCardName", "text", true)}
 
-                <div className="md:col-span-4 border-b pb-2 mt-4"><h3 className="font-bold text-primary flex items-center gap-2"><FaBriefcase /> Employment Details</h3></div>
+                {/* SECTION: Job Info */}
+                <div className="md:col-span-4 border-b pb-2 mt-4"><h3 className="font-bold text-primary flex items-center gap-2 uppercase tracking-wider"><FaBriefcase /> Employment Details</h3></div>
                 
+                {/* Company Dropdown */}
                 <div className="form-control">
-                  <label className="label-text font-bold mb-1">Company Selection <span className="text-error">*</span></label>
+                  <label className="label-text font-bold mb-1">Company <span className="text-error">*</span></label>
                   <select 
                     className={`select select-bordered w-full ${errors.company ? "select-error" : ""}`} 
                     value={formData.company} 
@@ -359,31 +434,91 @@ const Employee = () => {
                     <option value="">Select Company</option>
                     {companies.map(c => <option key={c._id} value={c._id}>{c.companyName}</option>)}
                   </select>
-                  {errors.company && <span className="text-error text-xs mt-1">{errors.company}</span>}
                 </div>
 
-                {renderInput("Department", "department")}
-                {renderInput("Designation", "designation")}
+                {/* Department Dropdown */}
+  <div className="form-control">
+                <label className="label-text font-bold mb-1">Department <span className="text-error">*</span></label>
+                <select 
+                  className={`select select-bordered w-full ${errors.department ? "select-error" : ""}`} 
+                  value={formData.department} 
+                  onChange={e => {
+                      // Save the .name string, NOT the ._id
+                      setFormData({...formData, department: e.target.value});
+                      setErrors({...errors, department: null});
+                  }}
+                >
+                  <option value="">Select Department</option>
+                  {departments.map(d => <option key={d._id} value={d.name}>{d.name}</option>)}
+                </select>
+              </div>
+
+                {/* Designation Dropdown */}
+  <div className="form-control">
+                <label className="label-text font-bold mb-1">Designation <span className="text-error">*</span></label>
+                <select 
+                  className={`select select-bordered w-full ${errors.designation ? "select-error" : ""}`} 
+                  value={formData.designation} 
+                  onChange={e => {
+                      // Save the .name string, NOT the ._id
+                      setFormData({...formData, designation: e.target.value});
+                      setErrors({...errors, designation: null});
+                  }}
+                >
+                  <option value="">Select Designation</option>
+                  {designations.map(des => <option key={des._id} value={des.name}>{des.name}</option>)}
+                </select>
+              </div>
+                <div className="form-control">
+  <label className="label-text font-bold mb-1">System Access Role</label>
+  <select 
+    className="select select-bordered w-full" 
+    value={formData.role} 
+    onChange={e => setFormData({...formData, role: e.target.value})}
+  >
+    <option value="user">User</option>
+    <option value="manager">Manager</option>
+    <option value="admin">Admin</option>
+  </select>
+  <p className="text-[10px] text-gray-500 mt-1">Default Password will be: Welcome123</p>
+</div>
+
                 {renderInput("Joining Date", "joiningDate", "date", false, <FaCalendarAlt/>)}
                 {renderInput("Current Salary", "currentSalary", "number", true, <FaMoneyBillWave/>)}
 
-                <div className="md:col-span-4 border-b pb-2 mt-4"><h3 className="font-bold text-primary flex items-center gap-2"><FaUserTie /> Personal & Contact</h3></div>
+                {/* SECTION: Contact Info */}
+                <div className="md:col-span-4 border-b pb-2 mt-4"><h3 className="font-bold text-primary flex items-center gap-2 uppercase tracking-wider"><FaUserTie /> Contact & Location</h3></div>
                 
                 {renderInput("Father's Name", "fatherName")}
                 {renderInput("Mother's Name", "motherName")}
-                {renderInput("Email", "employeeEmail", "email")}
-                {renderInput("Phone", "employeePhone", "text", true)}
+              {renderInput("Email", "employeeEmail", "email", true, <FaEnvelope/>)}
+                {renderInput("Phone", "employeePhone", "text", true, <FaPhone/>)}
                 
-                <div className="form-control md:col-span-3">
-                  <label className="label-text font-bold mb-1">Address</label>
-                  <input className="input input-bordered" value={formData.employeeAddress} onChange={(e) => setFormData({...formData, employeeAddress: e.target.value})} />
+                <div className="form-control md:col-span-2">
+                  <label className="label-text font-bold mb-1">Detailed Address <span className="text-error">*</span></label>
+                  <input className={`input input-bordered ${errors.employeeAddress ? "input-error" : ""}`} value={formData.employeeAddress} onChange={(e) => setFormData({...formData, employeeAddress: e.target.value})} placeholder="House, Road, Area..." />
                 </div>
-                {renderInput("City", "city")}
 
-                <div className="md:col-span-4 border-b pb-2 mt-4"><h3 className="font-bold text-primary flex items-center gap-2"><FaShieldAlt /> Emergency Contact</h3></div>
+                <div className="form-control md:col-span-2">
+                  <label className="label-text font-bold mb-1 flex items-center gap-2">
+                    <FaMapMarkerAlt className="text-primary"/> City/District <span className="text-error">*</span>
+                  </label>
+                  <select 
+                    className={`select select-bordered w-full ${errors.city ? "select-error" : ""}`}
+                    value={formData.city} 
+                    onChange={(e) => setFormData({...formData, city: e.target.value})}
+                  >
+                    <option value="">Select City</option>
+                    {districts.map((dist) => (
+                      <option key={dist.id || dist.district} value={dist.district}>{dist.district}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* SECTION: Emergency Contact */}
+                <div className="md:col-span-4 border-b pb-2 mt-4"><h3 className="font-bold text-primary flex items-center gap-2 uppercase tracking-wider"><FaShieldAlt /> Emergency Contact</h3></div>
                 
                 {renderInput("Contact Name", "emergencyContactName")}
-
                 <div className="form-control">
                   <label className="label-text font-bold mb-1">Relationship</label>
                   <select
@@ -392,46 +527,96 @@ const Employee = () => {
                     onChange={(e) => setFormData({...formData, emergencyContactRelation: e.target.value})}
                   >
                     <option value="">Select relationship</option>
-                        <option value="Father">Father</option>
-    <option value="Mother">Mother</option>
-    <option value="Husband">Husband</option>
-    <option value="Wife">Wife</option>
-    <option value="Son">Son</option>
-    <option value="Daughter">Daughter</option>
-    <option value="Brother">Brother</option>
-    <option value="Sister">Sister</option>
-    <option value="Uncle">Uncle</option>
-    <option value="Aunt">Aunt</option>
-    <option value="Cousin">Cousin</option>
-    <option value="Grandfather">Grandfather</option>
-    <option value="Grandmother">Grandmother</option>
-        <option value="Guardian">Guardian</option>
-    <option value="Relative">Relative</option>
-    <option value="Friend">Friend</option>
-    <option value="Neighbor">Neighbor</option>
-    <option value="Colleague">Colleague</option>
-                    <option value="Other">Other</option>
+                    {["Father", "Mother", "Husband", "Wife", "Brother", "Sister", "Other"].map(rel => (
+                        <option key={rel} value={rel}>{rel}</option>
+                    ))}
                   </select>
                 </div>
-
                 {renderInput("Emergency Phone", "emergencyContactPhone")}
 
-                <div className="md:col-span-4 border-b pb-2 mt-4"><h3 className="font-bold text-primary flex items-center gap-2"><FaFacebook /> Social Profiles</h3></div>
+                {/* SECTION: Socials & Photo */}
+                <div className="md:col-span-4 border-b pb-2 mt-4"><h3 className="font-bold text-primary flex items-center gap-2 uppercase tracking-wider"><FaFacebook /> Social Profiles</h3></div>
                 
                 <div className="form-control md:col-span-2">
-                  <label className="label-text font-bold mb-1">Facebook Link</label>
+                  <label className="label-text font-bold mb-1 flex items-center gap-2"><FaFacebook className="text-blue-600"/> Facebook</label>
                   <input className="input input-bordered" value={formData.facebookProfile} onChange={(e) => setFormData({...formData, facebookProfile: e.target.value})} />
                 </div>
                 <div className="form-control md:col-span-2">
-                  <label className="label-text font-bold mb-1">LinkedIn Link</label>
+                  <label className="label-text font-bold mb-1 flex items-center gap-2"><FaLinkedin className="text-blue-700"/> LinkedIn</label>
                   <input className="input input-bordered" value={formData.linkedinProfile} onChange={(e) => setFormData({...formData, linkedinProfile: e.target.value})} />
                 </div>
+                
+ <div className="md:col-span-4 border-b pb-2 mt-4">
+                  <h3 className="font-bold text-accent flex items-center gap-2 uppercase tracking-wider">
+                    <FaUniversity /> Bank Account Details
+                  </h3>
+                </div>
 
-                <div className="md:col-span-4 bg-base-200/50 p-6 rounded-2xl">
+                <div className="form-control">
+                  <label className="label-text font-bold mb-1">Bank Name</label>
+                  <select 
+                    className="select select-bordered w-full" 
+                    value={formData.bankInfo.bankName}
+                    onChange={(e) => setFormData({
+                      ...formData, 
+                      bankInfo: { ...formData.bankInfo, bankName: e.target.value }
+                    })}
+                  >
+                    <option value="">Select Bank</option>
+                    {bankList.map((bank, index) => (
+                      <option key={index} value={bank.name}>{bank.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-control">
+                  <label className="label-text font-bold mb-1 flex items-center gap-2">
+                    <FaCreditCard className="text-gray-400" /> Account Number
+                  </label>
+                  <input 
+                    type="text" 
+                    placeholder="e.g. 123.105.4567" 
+                    className="input input-bordered"
+                    value={formData.bankInfo.accountNumber}
+                    onChange={(e) => setFormData({
+                      ...formData, 
+                      bankInfo: { ...formData.bankInfo, accountNumber: e.target.value }
+                    })}
+                  />
+                </div>
+
+                <div className="form-control">
+                  <label className="label-text font-bold mb-1">Branch Name</label>
+                  <input 
+                    type="text" 
+                    placeholder="e.g. Motijheel Branch" 
+                    className="input input-bordered"
+                    value={formData.bankInfo.branch}
+                    onChange={(e) => setFormData({
+                      ...formData, 
+                      bankInfo: { ...formData.bankInfo, branch: e.target.value }
+                    })}
+                  />
+                </div>
+                <div className="form-control">
+  <label className="label-text font-bold mb-1">Routing Number</label>
+  <input 
+    type="text" 
+    placeholder="e.g. 020264567" 
+    className="input input-bordered"
+    value={formData.bankInfo.routingNumber}
+    onChange={(e) => setFormData({
+      ...formData, 
+      bankInfo: { ...formData.bankInfo, routingNumber: e.target.value }
+    })}
+  />
+</div>
+                <div className="md:col-span-4 bg-base-200/50 p-6 rounded-2xl mt-4">
                   <ImageUpload label="Employee Photograph" setImageUrl={(url) => setFormData({...formData, employeePhoto: url})} />
                 </div>
               </div>
 
+              {/* MODAL ACTIONS */}
               <div className="flex justify-end gap-3 mt-10 border-t pt-8">
                 <button type="button" className="btn btn-ghost px-8" onClick={() => setIsModalOpen(false)}>Discard</button>
                 <button type="submit" className="btn btn-primary px-12 text-white shadow-lg" disabled={isSubmitting}>
