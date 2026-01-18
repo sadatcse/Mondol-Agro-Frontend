@@ -1,27 +1,38 @@
 import React, { useState, useEffect, useCallback, useContext } from "react";
-import { AuthContext } from "../../providers/AuthProvider"; // Your AuthContext
+import { AuthContext } from "../../providers/AuthProvider"; 
 import UseAxiosSecure from "../../Hook/UseAxioSecure";
-import ImageUpload from "../../config/ImageUploadcpanel";
+import ImageUpload from "../../config/ImageUploadcpanel"; // Ensure this path is correct
 import useDistricts from "../../Hook/useDistricts"; 
 import { 
   FaUserTie, FaEnvelope, FaPhone, FaMapMarkerAlt, FaEdit, FaSave, FaTimes, 
-  FaFacebook, FaLinkedin, FaIdCard, FaBuilding, FaBriefcase, FaUserShield
+  FaFacebook, FaLinkedin, FaIdCard, FaBriefcase, FaUserShield, FaKey, FaLock
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 
 const Profile = () => {
-  // 1. Get User from Context
+  // --- 1. HOOKS & CONTEXT ---
   const { user } = useContext(AuthContext);
   const axiosSecure = UseAxiosSecure();
   const { districts } = useDistricts();
 
-  // State
+  // --- 2. STATES ---
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Edit Profile States
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Form Data State
+  // Change Password States
+  const [isPassModalOpen, setIsPassModalOpen] = useState(false);
+  const [isPassSubmitting, setIsPassSubmitting] = useState(false);
+  const [passData, setPassData] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: ""
+  });
+
+  // Profile Form Data
   const initialForm = {
     name: "",
     employeePhoto: "",
@@ -35,28 +46,26 @@ const Profile = () => {
     emergencyContactRelation: "",
     facebookProfile: "",
     linkedinProfile: "",
-    // Read-only fields from DB that we store to display in form
+    // Read-only / Hidden fields
     employeeEmail: "", 
     designation: "",
     department: ""
   };
-
   const [formData, setFormData] = useState(initialForm);
 
-  // --- API FETCHING ---
-const fetchProfile = useCallback(async () => {
-    // Wait until user context is loaded and has an email
+  // --- 3. FETCH DATA ---
+  const fetchProfile = useCallback(async () => {
     if (!user || !user.email) return;
 
     setLoading(true);
     try {
-      // CHANGE: Explicitly sending email in the URL
+      // Fetching by email as per your backend structure
       const { data } = await axiosSecure.get(`/employee/my-profile?email=${user.email}`);
       setProfile(data);
     } catch (err) {
       console.error(err);
       if(err.response?.status === 404) {
-          toast.error("Employee details not found for this email.");
+          toast.error("Employee details not found.");
       } else {
           toast.error("Could not load profile data.");
       }
@@ -69,8 +78,8 @@ const fetchProfile = useCallback(async () => {
     fetchProfile();
   }, [fetchProfile]);
 
-  // --- HANDLERS ---
-  const handleOpenModal = () => {
+  // --- 4. HANDLERS: EDIT PROFILE ---
+  const handleOpenEditModal = () => {
     if (profile) {
       setFormData({
         name: profile.name || "",
@@ -85,7 +94,6 @@ const fetchProfile = useCallback(async () => {
         emergencyContactRelation: profile.emergencyContactRelation || "",
         facebookProfile: profile.facebookProfile || "",
         linkedinProfile: profile.linkedinProfile || "",
-        // Read only
         employeeEmail: profile.employeeEmail || user.email,
         designation: profile.designation || "",
         department: profile.department || ""
@@ -94,16 +102,14 @@ const fetchProfile = useCallback(async () => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleProfileSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-
     try {
-      // Update using the Employee ID fetched from backend
       await axiosSecure.put(`/employee/update/${profile._id}`, formData);
       toast.success("Profile updated successfully!");
       setIsModalOpen(false);
-      fetchProfile(); // Refresh data
+      fetchProfile(); // Refresh UI
     } catch (err) {
       toast.error(err.response?.data?.error || "Update failed");
     } finally {
@@ -111,8 +117,43 @@ const fetchProfile = useCallback(async () => {
     }
   };
 
-  // --- RENDERING ---
+  // --- 5. HANDLERS: CHANGE PASSWORD ---
+  const handlePassChange = (e) => {
+    setPassData({ ...passData, [e.target.name]: e.target.value });
+  };
 
+  const handlePassSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validation
+    if (passData.newPassword !== passData.confirmPassword) {
+        return toast.error("New passwords do not match!");
+    }
+    if (passData.newPassword.length < 6) {
+        return toast.error("Password must be at least 6 characters.");
+    }
+
+    setIsPassSubmitting(true);
+    try {
+        // Hitting the specific route you created
+        await axiosSecure.put(`/user/change-password-profile`, { 
+            oldPassword: passData.oldPassword,
+            newPassword: passData.newPassword
+        });
+        
+        toast.success("Password changed successfully!");
+        setPassData({ oldPassword: "", newPassword: "", confirmPassword: "" }); // Reset form
+        setIsPassModalOpen(false); // Close modal
+    } catch (err) {
+        console.error(err);
+        // Display specific backend error (e.g., "Incorrect old password")
+        toast.error(err.response?.data?.message || "Failed to change password");
+    } finally {
+        setIsPassSubmitting(false);
+    }
+  };
+
+  // --- 6. RENDER: LOADING STATE ---
   if (loading) {
     return (
       <div className="p-6 bg-base-200 min-h-screen animate-pulse">
@@ -125,7 +166,7 @@ const fetchProfile = useCallback(async () => {
     );
   }
 
-  // Fallback if user is logged in but no employee record exists
+  // --- 7. RENDER: NO PROFILE FOUND ---
   if (!profile) {
     return (
       <div className="p-10 flex flex-col items-center justify-center min-h-[50vh] text-center bg-base-200">
@@ -134,17 +175,18 @@ const fetchProfile = useCallback(async () => {
             <h2 className="text-2xl font-black text-secondary">Profile Not Found</h2>
             <p className="py-4 text-neutral-500 max-w-md">
                 We found your account (<strong>{user?.email}</strong>), but there is no linked Employee record. 
-                Please contact HR or your Administrator.
+                Please contact HR.
             </p>
          </div>
       </div>
     );
   }
 
+  // --- 8. RENDER: MAIN UI ---
   return (
     <div className="p-6 bg-base-200 min-h-screen font-sans">
       
-      {/* HEADER */}
+      {/* HEADER SECTION */}
       <div className="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-sm mb-6 border-l-8 border-primary">
         <div>
           <h1 className="text-3xl font-black text-secondary flex items-center gap-2">
@@ -152,17 +194,30 @@ const fetchProfile = useCallback(async () => {
           </h1>
           <p className="text-neutral-500 font-medium">Manage your personal information</p>
         </div>
-        <button 
-          onClick={handleOpenModal} 
-          className="btn btn-primary text-white shadow-lg hover:scale-105 transition-all mt-4 md:mt-0"
-        >
-          <FaEdit /> Edit Profile
-        </button>
+        
+        <div className="flex flex-col md:flex-row gap-3 mt-4 md:mt-0">
+             {/* Change Password Button */}
+             <button 
+                onClick={() => setIsPassModalOpen(true)}
+                className="btn btn-neutral btn-outline hover:btn-error transition-all gap-2"
+            >
+                <FaKey /> Change Password
+            </button>
+
+            {/* Edit Profile Button */}
+            <button 
+                onClick={handleOpenEditModal} 
+                className="btn btn-primary text-white shadow-lg hover:scale-105 transition-all gap-2"
+            >
+                <FaEdit /> Edit Profile
+            </button>
+        </div>
       </div>
 
+      {/* GRID CONTENT */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
-        {/* LEFT CARD: IDENTITY */}
+        {/* LEFT COLUMN: IDENTITY CARD */}
         <div className="col-span-1 space-y-6">
           <div className="bg-white rounded-2xl shadow-sm p-8 text-center border border-base-300 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-primary/10 to-primary/5"></div>
@@ -194,7 +249,7 @@ const fetchProfile = useCallback(async () => {
             </div>
           </div>
 
-          {/* COMPANY DETAILS (Read Only) */}
+          {/* EMPLOYMENT INFO (Read Only) */}
           <div className="bg-white rounded-2xl shadow-sm p-6 border border-base-300">
              <h3 className="font-bold text-primary flex items-center gap-2 uppercase tracking-wider text-sm mb-4">
                 <FaBriefcase /> Employment Info
@@ -222,10 +277,10 @@ const fetchProfile = useCallback(async () => {
           </div>
         </div>
 
-        {/* RIGHT CARD: DETAILS */}
+        {/* RIGHT COLUMN: DETAILS */}
         <div className="col-span-1 md:col-span-2 space-y-6">
           
-          {/* Personal Info */}
+          {/* PERSONAL INFO */}
           <div className="bg-white rounded-2xl shadow-sm p-8 border border-base-300">
             <h3 className="font-bold text-secondary flex items-center gap-2 uppercase tracking-wider text-sm border-b pb-4 mb-6">
                <FaIdCard className="text-primary"/> Personal & Contact Details
@@ -266,7 +321,7 @@ const fetchProfile = useCallback(async () => {
             </div>
           </div>
 
-          {/* Emergency Contact */}
+          {/* EMERGENCY CONTACT */}
           <div className="bg-white rounded-2xl shadow-sm p-8 border border-base-300">
             <h3 className="font-bold text-primary flex items-center gap-2 uppercase tracking-wider text-sm border-b pb-4 mb-6">
                <span className="bg-error/10 p-1.5 rounded-full"><FaPhone className="text-xs" /></span> Emergency Contact
@@ -286,11 +341,10 @@ const fetchProfile = useCallback(async () => {
                </div>
             </div>
           </div>
-
         </div>
       </div>
 
-      {/* --- EDIT MODAL --- */}
+      {/* --- MODAL 1: EDIT PROFILE --- */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-base-100 rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col border-t-8 border-primary">
@@ -309,7 +363,7 @@ const fetchProfile = useCallback(async () => {
             </div>
 
             {/* Modal Form */}
-            <form onSubmit={handleSubmit} className="p-8 overflow-y-auto custom-scrollbar">
+            <form onSubmit={handleProfileSubmit} className="p-8 overflow-y-auto custom-scrollbar">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                 {/* Photo Upload */}
@@ -403,6 +457,72 @@ const fetchProfile = useCallback(async () => {
           </div>
         </div>
       )}
+
+      {/* --- MODAL 2: CHANGE PASSWORD --- */}
+      {isPassModalOpen && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
+           <div className="bg-white rounded-3xl w-full max-w-lg shadow-2xl flex flex-col border-t-8 border-neutral">
+              
+              <div className="p-6 border-b flex justify-between items-center bg-base-50">
+                  <h2 className="text-xl font-black text-secondary flex items-center gap-2 uppercase">
+                    <FaLock className="text-neutral"/> Change Password
+                  </h2>
+                  <button onClick={() => setIsPassModalOpen(false)} className="btn btn-circle btn-sm btn-ghost"><FaTimes/></button>
+              </div>
+
+              <form onSubmit={handlePassSubmit} className="p-8 space-y-4">
+                  <div className="form-control">
+                      <label className="label-text font-bold mb-1">Current Password</label>
+                      <input 
+                        type="password"
+                        name="oldPassword" 
+                        required 
+                        className="input input-bordered w-full focus:border-neutral" 
+                        placeholder="Enter current password"
+                        value={passData.oldPassword}
+                        onChange={handlePassChange}
+                      />
+                  </div>
+                  
+                  <div className="divider my-1"></div>
+
+                  <div className="form-control">
+                      <label className="label-text font-bold mb-1">New Password</label>
+                      <input 
+                        type="password"
+                        name="newPassword" 
+                        required 
+                        className="input input-bordered w-full focus:border-neutral" 
+                        placeholder="Min 6 characters"
+                        value={passData.newPassword}
+                        onChange={handlePassChange}
+                      />
+                  </div>
+
+                  <div className="form-control">
+                      <label className="label-text font-bold mb-1">Confirm New Password</label>
+                      <input 
+                        type="password" 
+                        name="confirmPassword"
+                        required 
+                        className="input input-bordered w-full focus:border-neutral" 
+                        placeholder="Re-type new password"
+                        value={passData.confirmPassword}
+                        onChange={handlePassChange}
+                      />
+                  </div>
+
+                  <div className="pt-4 flex justify-end gap-3">
+                      <button type="button" className="btn btn-ghost" onClick={() => setIsPassModalOpen(false)}>Cancel</button>
+                      <button type="submit" className="btn btn-primary text-white" disabled={isPassSubmitting}>
+                        {isPassSubmitting ? <span className="loading loading-spinner"></span> : "Update Password"}
+                      </button>
+                  </div>
+              </form>
+           </div>
+        </div>
+      )}
+
     </div>
   );
 };
