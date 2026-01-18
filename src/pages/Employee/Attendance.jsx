@@ -4,7 +4,7 @@ import { useEmployee } from "../../Hook/useEmployee";
 import { useDepartment } from "../../Hook/useDepartment";
 import SkeletonLoader from "../../components/SkeletonLoader";
 import { 
-  FaEdit, FaTrash, FaPlus, FaCalendarAlt, FaUserFriends, FaArrowLeft, FaClock
+  FaEdit, FaTrash, FaPlus, FaCalendarAlt, FaUserFriends, FaArrowLeft
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";

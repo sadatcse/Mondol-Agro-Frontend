@@ -3,7 +3,7 @@ import { useDepartment } from "../../Hook/useDepartment";
 import SkeletonLoader from "../../components/SkeletonLoader";
 import TableControls from "../../components/TableControls";
 import { 
-  FaEdit, FaTrash, FaPlus, FaTimes, FaBuilding, FaSave, 
+  FaEdit, FaTrash, FaPlus, FaTimes, FaBuilding,
   FaChevronLeft, FaChevronRight, FaCheckCircle, FaBan 
 } from "react-icons/fa";
 import toast from "react-hot-toast";

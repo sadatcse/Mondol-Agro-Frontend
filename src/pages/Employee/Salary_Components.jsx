@@ -4,7 +4,7 @@ import SkeletonLoader from "../../components/SkeletonLoader";
 import TableControls from "../../components/TableControls";
 import { 
   FaEdit, FaTrash, FaPlus, FaTimes, FaMoneyCheckAlt, FaSave, 
-  FaChevronLeft, FaChevronRight, FaPercent, FaCoins, FaShieldAlt,
+  FaChevronLeft, FaChevronRight, FaPercent, FaCoins,
   FaFilter, FaRedo
 } from "react-icons/fa";
 import toast from "react-hot-toast";

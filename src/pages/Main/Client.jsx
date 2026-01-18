@@ -6,8 +6,8 @@ import ImageUpload from "../../config/ImageUploadcpanel";
 import useDistricts from "../../Hook/useDistricts";
 import { 
   FaEdit, FaTrash, FaPlus, FaGlobe, FaEnvelope, FaTimes, 
-  FaUserFriends, FaSave, FaPhone, FaMapMarkerAlt, FaBriefcase,
-  FaChevronLeft, FaChevronRight, FaAddressCard, FaCreditCard, 
+  FaUserFriends, FaSave, FaMapMarkerAlt, 
+   FaAddressCard, FaCreditCard, 
   FaTags, FaUserPlus, FaUserTie
 } from "react-icons/fa";
 import toast from "react-hot-toast";

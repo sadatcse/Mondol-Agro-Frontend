@@ -6,9 +6,9 @@ import { useClient } from "../../Hook/useClient"; // Generated following your pa
 import SkeletonLoader from "../../components/SkeletonLoader";
 import TableControls from "../../components/TableControls";
 import { 
-  FaEdit, FaTrash, FaPlus, FaTimes, FaProjectDiagram, FaSave, 
-  FaCalendarAlt, FaMoneyBillWave, FaTasks, FaSignal,
-  FaChevronLeft, FaChevronRight, FaBuilding, FaUserFriends, FaExclamationTriangle
+  FaEdit, FaTrash, FaPlus, FaTimes, FaProjectDiagram,
+ 
+  FaChevronLeft, FaChevronRight, 
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";

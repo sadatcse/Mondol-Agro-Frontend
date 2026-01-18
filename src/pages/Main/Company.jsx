@@ -5,8 +5,8 @@ import TableControls from "../../components/TableControls";
 import ImageUpload from "../../config/ImageUploadcpanel";
 import useDistricts from "../../Hook/useDistricts"; // Import District Hook
 import { 
-  FaEdit, FaTrash, FaPlus, FaGlobe, FaEnvelope, FaTimes, 
-  FaBuilding, FaSave, FaPhone, FaMapMarkerAlt, FaIdCard, FaUserTie, FaBriefcase,
+  FaEdit, FaTrash, FaPlus, FaGlobe,  FaTimes, 
+  FaBuilding, FaSave, FaMapMarkerAlt, FaIdCard, FaUserTie, FaBriefcase,
   FaChevronLeft, FaChevronRight
 } from "react-icons/fa";
 import toast from "react-hot-toast";

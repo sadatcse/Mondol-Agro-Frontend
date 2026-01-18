@@ -5,7 +5,7 @@ import { useDepartment } from "../../Hook/useDepartment";
 import { useEmployee } from "../../Hook/useEmployee";
 import { useCompany } from "../../Hook/useCompany";
 import SkeletonLoader from "../../components/SkeletonLoader";
-import { FaPrint, FaFileExcel, FaFileDownload } from "react-icons/fa";
+import { FaPrint, FaFileExcel,  } from "react-icons/fa";
 
 const Attendancereport = () => {
   const { getAttendanceReport, loading } = useAttendance();

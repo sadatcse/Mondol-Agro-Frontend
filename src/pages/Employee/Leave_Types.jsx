@@ -4,7 +4,7 @@ import SkeletonLoader from "../../components/SkeletonLoader";
 import TableControls from "../../components/TableControls";
 import { 
   FaEdit, FaTrash, FaPlus, FaTimes, FaCalendarCheck, FaSave, 
-  FaChevronLeft, FaChevronRight, FaCheckCircle, FaBan, FaInfoCircle
+  FaChevronLeft, FaChevronRight
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";

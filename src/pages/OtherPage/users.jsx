@@ -2,8 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useUser } from "../../Hook/useUser";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  FaEdit, FaUserShield, FaSave, FaTimes,
-  FaUserTag, FaEnvelope, FaShieldAlt, FaKey,
+  FaEdit, FaUserShield, FaSave, FaTimes, FaKey,
   FaChevronLeft, FaChevronRight, FaCircle, FaLock
 } from "react-icons/fa";
 import toast from "react-hot-toast";

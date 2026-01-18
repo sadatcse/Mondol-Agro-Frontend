@@ -8,10 +8,7 @@ import { FaPrint, FaEye, FaTimes, FaFilter, FaUsers, FaFileExcel } from "react-i
 import { useReactToPrint } from 'react-to-print';
 import * as XLSX from 'xlsx';
 
-// --- Sub-Components ---
 
-// A. PRINTABLE DOCUMENT COMPONENT (Hidden from screen, visible to printer)
-// This component groups employees by Company for the print report.
 const PrintableDirectory = React.forwardRef(({ employees, companyMap }, ref) => {
   return (
     <div ref={ref} className="p-8 bg-white text-black print-container">
@@ -20,7 +17,7 @@ const PrintableDirectory = React.forwardRef(({ employees, companyMap }, ref) => 
         <p className="text-sm text-gray-500">Generated on {new Date().toLocaleDateString()}</p>
       </div>
 
-      {/* Loop through companies to create sections */}
+  
       {Object.keys(companyMap).length > 0 ? (
         Object.keys(companyMap).map((companyName) => {
           const companyEmployees = employees.filter(e => (e.company?.companyName || "Unknown") === companyName);

@@ -11,7 +11,7 @@ import {
   FaEdit, FaTrash, FaPlus, FaTimes, FaSave, FaUserTie, 
   FaIdCard, FaBriefcase, FaEnvelope, FaPhone, FaMapMarkerAlt,
   FaFacebook, FaLinkedin, FaUsers, FaChevronLeft, FaChevronRight,
-  FaCalendarAlt, FaMoneyBillWave, FaShieldAlt, FaBuilding, FaInfoCircle,
+  FaCalendarAlt, FaMoneyBillWave, FaShieldAlt, FaBuilding,
   FaCreditCard,
   FaUniversity
 } from "react-icons/fa";
