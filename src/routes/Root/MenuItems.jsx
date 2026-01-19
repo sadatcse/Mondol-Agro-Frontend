@@ -358,10 +358,11 @@ const menuItems = () => {
           path: "/dashboard/setting/paymenttype",
           icon: <MdPayments className="text-base" />,
         },
-
-
-
-       
+        {
+          title: " Expense Category",
+          path: "/dashboard/setting/expensecategory",
+          icon: <MdPayments className="text-base" />,
+        },
       ],
     },
   ];

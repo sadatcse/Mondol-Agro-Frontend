@@ -77,7 +77,7 @@ const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       if (user?.email) {
-        await axiosSecure.post("/user/logout", { email: user.email });
+        // await axiosSecure.post("/user/logout", { email: user.email });
       }
 
       setUser(null);

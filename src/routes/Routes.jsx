@@ -41,6 +41,8 @@ import TimeSheet from "../pages/OfficeUser/TimeSheet";
 // Settings
 import UserPermission from "../pages/Setting/UserPermission";
 import PaymentType from "../pages/Setting/PaymentType";
+import ExpenseCategory from "../pages/Setting/ExpenseCategory";
+import ActivityLog from "../pages/Setting/ActivityLog";
 
 export const router = createBrowserRouter([
   {
@@ -283,6 +285,19 @@ export const router = createBrowserRouter([
         path: "setting/paymenttype",
         element: <PrivateRoot><PaymentType /></PrivateRoot>,
       },
+          {
+        path: "setting/expensecategory",
+        element: <PrivateRoot><ExpenseCategory /></PrivateRoot>,
+      },
+      {
+        path: "setting/activitylog",
+        element: <PrivateRoot><ActivityLog /></PrivateRoot>,
+      },
+
+      
+
+
+      
 
 
 

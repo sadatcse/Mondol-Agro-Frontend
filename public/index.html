@@ -1,57 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="mytheme">
   <head>
+    <!-- FORCE LIGHT MODE (NO DARK MODE AT ALL) -->
     <script>
-      (function() {
-        // Use the same keys as your React hook
-        const THEME_KEY = "theme"; 
-        
-        // 1. Check for saved manual theme
-        const savedTheme = localStorage.getItem(THEME_KEY);
-        
-        // 2. Determine initial theme (saved theme or system preference)
-        const initialTheme = savedTheme 
-                             ? savedTheme 
-                             : (window.matchMedia('(prefers-color-scheme: dark)').matches ? "dark" : "light");
+      (function () {
+        // Remove any stored theme
+        localStorage.removeItem("theme");
 
-        // 3. Apply the 'dark' class instantly to the <html> tag
-        if (initialTheme === 'dark') {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
+        // Ensure dark class is never applied
+        document.documentElement.classList.remove("dark");
+
+        // Force DaisyUI theme
+        document.documentElement.setAttribute("data-theme", "mytheme");
       })();
     </script>
+
     <meta charset="utf-8" />
+
+    <!-- Favicons -->
     <link rel="icon" href="favicon.ico" />
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="android-chrome-192x192.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="android-chrome-512x512.png" />
-    
+
+    <!-- PWA -->
     <link rel="manifest" href="manifest.json" />
 
+    <!-- Meta -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta name="description" content="Multisports.com.bd is your one-stop online shop for high-quality sports equipment, apparel, and accessories in Bangladesh." />
-    <meta name="keywords" content="sports shop Bangladesh, online sports store, cricket equipment, football, badminton racket, sports gear, Multisports BD" />
-    <meta name="author" content="Multisports.com.bd" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta
+      name="description"
+      content="Data IT is a software development and IT services company in Bangladesh delivering custom web applications, AI-powered systems, ERP, POS, and digital transformation solutions for businesses worldwide."
+    />
+    <meta
+      name="keywords"
+      content="software company Bangladesh, custom software development, web application development, ERP system Bangladesh, POS software, AI solutions, digital transformation, Data IT"
+    />
+    <meta name="author" content="Data IT" />
 
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Multisports.com.bd | Premier Online Sports Store" />
-    <meta property="og:description" content="Discover a wide range of authentic sports gear and apparel. We offer fast delivery and competitive prices across Bangladesh." />
-    <meta property="og:image" content="logo512.png" /> <meta property="og:url" content="https://www.multisports.com.bd" />
-    <meta property="og:site_name" content="Multisports.com.bd" />
-    
+    <meta property="og:title" content="Data IT | Software Development & Digital Transformation Company" />
+    <meta
+      property="og:description"
+      content="Data IT helps businesses grow with custom software, AI-driven systems, ERP, POS, and scalable digital solutions. Trusted technology partner in Bangladesh and globally."
+    />
+    <meta property="og:image" content="logo512.png" />
+    <meta property="og:url" content="https://www.datait.com.bd" />
+    <meta property="og:site_name" content="Data IT" />
+
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Multisports.com.bd | Your Premier Online Sports Store" />
-    <meta name="twitter:description" content="Shop for the best sports equipment in Bangladesh at Multisports.com.bd. From cricket to football, we have it all." />
-    <meta name="twitter:site" content="@YourTwitterHandle" /> <title>Multisports.com.bd</title>
+    <meta name="twitter:title" content="Data IT | Custom Software & IT Services Company" />
+    <meta
+      name="twitter:description"
+      content="Build scalable, secure, and intelligent digital solutions with Data IT. Custom software, AI, ERP, POS, and digital transformation services."
+    />
+    <meta name="twitter:site" content="@dataitbd" />
+
+    <title>Data IT | Software Development & IT Services Company</title>
   </head>
-  <body>
+
+  <body class="bg-white text-base-content">
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    
   </body>
 </html>
