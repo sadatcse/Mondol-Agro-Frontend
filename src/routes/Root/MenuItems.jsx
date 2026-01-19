@@ -353,6 +353,15 @@ const menuItems = () => {
           path: "/dashboard/setting/permission",
           icon: <MdPayments className="text-base" />,
         },
+            {
+          title: " Payment Type",
+          path: "/dashboard/setting/paymenttype",
+          icon: <MdPayments className="text-base" />,
+        },
+
+
+
+       
       ],
     },
   ];

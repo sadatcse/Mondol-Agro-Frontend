@@ -1,65 +1,46 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import React from "react";
 
-// ================= PAGES IMPORTS =================
 import Error404 from "../pages/Error404/Error";
 import Login from "../pages/Login/Login";
 import Root from "./Root/Root";
 import PrivateRoot from "./Root/PrivateRoot";
 import Aroot from "./Root/Aroot";
 
-// Dashboard
+// Dashboard & Main
 import Home from "../pages/Dashboard/Home";
-
-// Office User
-import Profile from "../pages/OfficeUser/Profile";
-import Attendence from "../pages/OfficeUser/Attendence";
-import TimeSheet from "../pages/OfficeUser/TimeSheet";
-import Directory from "../pages/OfficeUser/Directory";
-import Papers from "../pages/OfficeUser/Papers";
-
-// Cash
 import CashIn from "../pages/Main/CashIn";
 import Cashout from "../pages/Main/Cashout";
-
-// Company
 import Company from "../pages/Main/Company";
-
-// Employee (Main & Sub)
 import Employee from "../pages/Main/Employee";
-import Attendance from "../pages/Employee/Attendance";
-import Leaves from "../pages/Employee/Leaves";
-import Payroll from "../pages/Employee/Payroll";
-import Users from "../pages/OtherPage/users"; // Panel Access
-
-// Projects
 import Project from "../pages/Main/Project";
-
-// Vendors
 import Vendor from "../pages/Main/Vendor";
-
-// Clients
 import Client from "../pages/Main/Client";
+import Users from "../pages/OtherPage/users";
 
-// Reports
-import Employeedirectory from "../pages/Report/Employeedirectory";
-import Attendancereport from "../pages/Report/Attendancereport";
-import Payrollsummary from "../pages/Report/Payrollsummary";
-
-// Settings
+// Employee Pages
 import Departments from "../pages/Employee/Departments";
 import Designations from "../pages/Employee/Designations";
 import LeaveTypes from "../pages/Employee/Leave_Types";
 import SalaryComponents from "../pages/Employee/Salary_Components";
-import UserPermission from "../pages/Setting/UserPermission";
+import Attendance from "../pages/Employee/Attendance";
+import Leaves from "../pages/Employee/Leaves";
+import Payroll from "../pages/Employee/Payroll";
 
-// ================= TEMPORARY PLACEHOLDER =================
-// Use this for routes where you haven't created the file yet
-const ComingSoon = ({ title }) => (
-  <div className="flex items-center justify-center h-full">
-    <h1 className="text-2xl font-bold text-gray-500">{title} - Page Under Construction</h1>
-  </div>
-);
+// Report Pages
+import Payrollsummary from "../pages/Report/Payrollsummary";
+import Attendancereport from "../pages/Report/Attendancereport";
+import Employeedirectory from "../pages/Report/Employeedirectory";
+
+// Office User Pages
+import Attendence from "../pages/OfficeUser/Attendence";
+import Directory from "../pages/OfficeUser/Directory";
+import Papers from "../pages/OfficeUser/Papers";
+import Profile from "../pages/OfficeUser/Profile";
+import TimeSheet from "../pages/OfficeUser/TimeSheet";
+
+// Settings
+import UserPermission from "../pages/Setting/UserPermission";
+import PaymentType from "../pages/Setting/PaymentType";
 
 export const router = createBrowserRouter([
   {
@@ -78,7 +59,6 @@ export const router = createBrowserRouter([
     element: <Aroot />,
     errorElement: <Error404 />,
     children: [
-      // Redirect root dashboard to home
       {
         path: "",
         element: (
@@ -88,13 +68,13 @@ export const router = createBrowserRouter([
         ),
       },
 
-      // ================= 1. DASHBOARD =================
+      // ================= DASHBOARD =================
       {
         path: "home",
         element: <PrivateRoot><Home /></PrivateRoot>,
       },
 
-      // ================= 2. MY OFFICE =================
+      // ================= OFFICE MANAGEMENT =================
       {
         path: "office/profile",
         element: <PrivateRoot><Profile /></PrivateRoot>,
@@ -116,33 +96,33 @@ export const router = createBrowserRouter([
         element: <PrivateRoot><Papers /></PrivateRoot>,
       },
 
-      // ================= 3. FINANCE & ACCOUNTING (New) =================
+      // ================= FINANCE & ACCOUNTING (New Placeholders) =================
       {
         path: "finance/chart-of-accounts",
-        element: <PrivateRoot><ComingSoon title="Chart of Accounts" /></PrivateRoot>,
+        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
       },
       {
         path: "finance/capital",
-        element: <PrivateRoot><ComingSoon title="Capital" /></PrivateRoot>,
+        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
       },
       {
         path: "finance/loans",
-        element: <PrivateRoot><ComingSoon title="Loans" /></PrivateRoot>,
+        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
       },
       {
         path: "finance/profit-loss",
-        element: <PrivateRoot><ComingSoon title="Profit & Loss" /></PrivateRoot>,
+        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
       },
       {
         path: "finance/balance-sheet",
-        element: <PrivateRoot><ComingSoon title="Balance Sheet" /></PrivateRoot>,
+        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
       },
       {
         path: "finance/cash-flow",
-        element: <PrivateRoot><ComingSoon title="Cash Flow" /></PrivateRoot>,
+        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
       },
 
-      // ================= 4. CASH =================
+      // ================= CASH =================
       {
         path: "cashIn",
         element: <PrivateRoot><CashIn /></PrivateRoot>,
@@ -152,28 +132,28 @@ export const router = createBrowserRouter([
         element: <PrivateRoot><Cashout /></PrivateRoot>,
       },
 
-      // ================= 5. COMPANY MANAGEMENT =================
+      // ================= COMPANY MANAGEMENT =================
       {
         path: "company",
         element: <PrivateRoot><Company /></PrivateRoot>,
       },
       {
         path: "company/balance-sheet",
-        element: <PrivateRoot><ComingSoon title="Company Balance Sheet" /></PrivateRoot>,
+        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
       },
       {
         path: "company/expenses",
-        element: <PrivateRoot><ComingSoon title="Expense Report" /></PrivateRoot>,
+        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
       },
       {
         path: "company/purchases",
-        element: <PrivateRoot><ComingSoon title="Purchase Report" /></PrivateRoot>,
+        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
       },
 
-      // ================= 6. EMPLOYEE (HR/Admin) =================
+      // ================= EMPLOYEE (HR/Admin) =================
       {
         path: "employee",
-        element: <PrivateRoot><Employee /></PrivateRoot>, // Employee Profile
+        element: <PrivateRoot><Employee /></PrivateRoot>,
       },
       {
         path: "employee/attendance",
@@ -189,82 +169,82 @@ export const router = createBrowserRouter([
       },
       {
         path: "users",
-        element: <PrivateRoot><Users /></PrivateRoot>, // Panel Access
+        element: <PrivateRoot><Users /></PrivateRoot>,
       },
       {
         path: "hr/letters",
-        element: <PrivateRoot><ComingSoon title="Employee Letters" /></PrivateRoot>,
+        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
       },
       {
         path: "hr/performance",
-        element: <PrivateRoot><ComingSoon title="Performance Evaluation" /></PrivateRoot>,
+        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
       },
       {
         path: "hr/salary-transfer",
-        element: <PrivateRoot><ComingSoon title="Salary Transfer" /></PrivateRoot>,
+        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
       },
 
-      // ================= 7. PROJECT =================
+      // ================= PROJECTS =================
       {
         path: "project",
         element: <PrivateRoot><Project /></PrivateRoot>,
       },
       {
         path: "projects/payments",
-        element: <PrivateRoot><ComingSoon title="Project Payments" /></PrivateRoot>,
+        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
       },
       {
         path: "projects/ledger",
-        element: <PrivateRoot><ComingSoon title="Project Ledger" /></PrivateRoot>,
+        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
       },
 
-      // ================= 8. VENDOR =================
+      // ================= VENDORS =================
       {
         path: "vendor",
         element: <PrivateRoot><Vendor /></PrivateRoot>,
       },
       {
         path: "vendors/purchases",
-        element: <PrivateRoot><ComingSoon title="Vendor Purchases" /></PrivateRoot>,
+        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
       },
       {
         path: "vendors/payments",
-        element: <PrivateRoot><ComingSoon title="Vendor Payments" /></PrivateRoot>,
+        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
       },
       {
         path: "vendors/ledger",
-        element: <PrivateRoot><ComingSoon title="Vendor Ledger" /></PrivateRoot>,
+        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
       },
 
-      // ================= 9. CLIENT =================
+      // ================= CLIENTS =================
       {
         path: "clients",
         element: <PrivateRoot><Client /></PrivateRoot>,
       },
       {
         path: "clients/payments",
-        element: <PrivateRoot><ComingSoon title="Client Payments" /></PrivateRoot>,
+        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
       },
       {
         path: "clients/ledger",
-        element: <PrivateRoot><ComingSoon title="Client Ledger" /></PrivateRoot>,
+        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
       },
 
-      // ================= 10. INVENTORY & STOCK (New) =================
+      // ================= INVENTORY & STOCK (New Placeholders) =================
       {
         path: "inventory",
-        element: <PrivateRoot><ComingSoon title="Stock Overview" /></PrivateRoot>,
+        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
       },
       {
         path: "inventory/transfers",
-        element: <PrivateRoot><ComingSoon title="Stock Transfers" /></PrivateRoot>,
+        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
       },
       {
         path: "inventory/warehouses",
-        element: <PrivateRoot><ComingSoon title="Warehouses" /></PrivateRoot>,
+        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
       },
 
-      // ================= 11. REPORT =================
+      // ================= REPORTS =================
       {
         path: "report/employee-directory",
         element: <PrivateRoot><Employeedirectory /></PrivateRoot>,
@@ -278,7 +258,7 @@ export const router = createBrowserRouter([
         element: <PrivateRoot><Payrollsummary /></PrivateRoot>,
       },
 
-      // ================= 12. SETTINGS =================
+      // ================= SETTINGS =================
       {
         path: "settings/departments",
         element: <PrivateRoot><Departments /></PrivateRoot>,
@@ -299,6 +279,14 @@ export const router = createBrowserRouter([
         path: "setting/permission",
         element: <PrivateRoot><UserPermission /></PrivateRoot>,
       },
+       {
+        path: "setting/paymenttype",
+        element: <PrivateRoot><PaymentType /></PrivateRoot>,
+      },
+
+
+
+      
     ],
   },
 ]);
