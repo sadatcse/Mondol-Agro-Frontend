@@ -71,6 +71,8 @@ const Departments = () => {
   };
 
   const handleDelete = async (id) => {
+    const isDark = document.documentElement.classList.contains("dark");
+
     Swal.fire({
       title: "Are you sure?",
       text: "This department will be permanently deleted!",
@@ -78,7 +80,9 @@ const Departments = () => {
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!"
+      confirmButtonText: "Yes, delete it!",
+      background: isDark ? "#1f2937" : "#fff",
+      color: isDark ? "#fff" : "#000",
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
@@ -93,23 +97,23 @@ const Departments = () => {
   };
 
   return (
-    <div className="p-6 bg-base-200 min-h-screen">
+    <div className="p-6 bg-base-200 dark:bg-gray-900 min-h-screen transition-colors duration-300">
       {/* Header */}
-      <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm mb-6 border-l-8 border-primary">
+      <div className="flex flex-col md:flex-row justify-between items-center bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm mb-6 border-l-8 border-primary transition-colors">
         <div>
-          <h1 className="text-3xl font-black text-secondary flex items-center gap-2">
+          <h1 className="text-3xl font-black text-secondary dark:text-white flex items-center gap-2">
             <FaBuilding className="text-primary" /> Departments
           </h1>
-          <p className="text-neutral-500 font-medium italic text-sm">Manage company divisions and codes</p>
+          <p className="text-neutral-500 dark:text-gray-400 font-medium italic text-sm">Manage company divisions and codes</p>
         </div>
-        <button onClick={() => handleOpenModal()} className="btn btn-primary text-white shadow-lg">
+        <button onClick={() => handleOpenModal()} className="btn btn-primary text-white shadow-lg mt-4 md:mt-0">
           <FaPlus /> Add Department
         </button>
       </div>
 
       {/* Table Section */}
-      <div className="bg-base-100 rounded-2xl shadow-sm border border-base-300">
-        <div className="p-4">
+      <div className="bg-base-100 dark:bg-gray-800 rounded-2xl shadow-sm border border-base-300 dark:border-gray-700 transition-colors">
+        <div className="p-4 bg-base-50/50 dark:bg-gray-700/30">
           <TableControls 
             itemsPerPage={itemsPerPage} 
             onItemsPerPageChange={(e) => { setItemsPerPage(e.target.value); setCurrentPage(1); }} 
@@ -120,7 +124,7 @@ const Departments = () => {
 
         <div className="overflow-x-auto">
           <table className="table w-full">
-            <thead className="bg-base-200/50 text-secondary uppercase text-[10px] tracking-widest">
+            <thead className="bg-base-200/50 dark:bg-gray-700/50 text-secondary dark:text-gray-200 uppercase text-[10px] tracking-widest border-b dark:border-gray-600">
               <tr>
                 <th>Department Details</th>
                 <th>Code</th>
@@ -133,9 +137,9 @@ const Departments = () => {
                 <tr><td colSpan="4"><SkeletonLoader /></td></tr>
               ) : (
                 departments.map((dept) => (
-                  <tr key={dept._id} className="hover:bg-primary/5 transition-colors border-b">
-                    <td><div className="font-bold text-secondary text-lg">{dept.name}</div></td>
-                    <td><div className="badge badge-ghost font-mono text-primary uppercase">{dept.code || "N/A"}</div></td>
+                  <tr key={dept._id} className="hover:bg-primary/5 dark:hover:bg-gray-700/50 transition-colors border-b dark:border-gray-700 border-base-200">
+                    <td><div className="font-bold text-secondary dark:text-white text-lg">{dept.name}</div></td>
+                    <td><div className="badge badge-ghost dark:bg-gray-700 dark:text-gray-300 font-mono text-primary uppercase">{dept.code || "N/A"}</div></td>
                     <td>
                       <div className={`badge ${dept.status === 'Active' ? 'badge-success' : 'badge-error'} badge-outline font-bold text-[10px]`}>
                         {dept.status === 'Active' ? <FaCheckCircle className="mr-1"/> : <FaBan className="mr-1"/>}
@@ -143,8 +147,10 @@ const Departments = () => {
                       </div>
                     </td>
                     <td className="text-center">
-                      <button onClick={() => handleOpenModal(dept)} className="btn btn-sm btn-ghost text-primary"><FaEdit /></button>
-                      <button onClick={() => handleDelete(dept._id)} className="btn btn-sm btn-ghost text-error"><FaTrash /></button>
+                      <div className="flex justify-center gap-1">
+                        <button onClick={() => handleOpenModal(dept)} className="btn btn-sm btn-ghost text-primary hover:bg-primary/10"><FaEdit /></button>
+                        <button onClick={() => handleDelete(dept._id)} className="btn btn-sm btn-ghost text-error hover:bg-error/10"><FaTrash /></button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -154,12 +160,12 @@ const Departments = () => {
         </div>
 
         {/* Pagination */}
-        <div className="p-4 flex justify-between items-center bg-base-50 rounded-b-2xl">
-           <span className="text-xs font-medium opacity-60">Showing {departments.length} of {totalItems}</span>
+        <div className="p-4 flex flex-col md:flex-row justify-between items-center bg-base-50 dark:bg-gray-800 rounded-b-2xl border-t dark:border-gray-700 transition-colors">
+           <span className="text-xs font-medium opacity-60 dark:text-gray-400 mb-2 md:mb-0">Showing {departments.length} of {totalItems}</span>
            <div className="join">
-              <button disabled={currentPage === 1} className="join-item btn btn-xs" onClick={() => setCurrentPage(p => p - 1)}><FaChevronLeft/></button>
-              <button className="join-item btn btn-xs bg-white px-4">{currentPage}</button>
-              <button disabled={currentPage >= totalPages} className="join-item btn btn-xs" onClick={() => setCurrentPage(p => p + 1)}><FaChevronRight/></button>
+              <button disabled={currentPage === 1} className="join-item btn btn-xs dark:bg-gray-700 dark:text-white dark:border-gray-600" onClick={() => setCurrentPage(p => p - 1)}><FaChevronLeft/></button>
+              <button className="join-item btn btn-xs bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 px-4">{currentPage}</button>
+              <button disabled={currentPage >= totalPages} className="join-item btn btn-xs dark:bg-gray-700 dark:text-white dark:border-gray-600" onClick={() => setCurrentPage(p => p + 1)}><FaChevronRight/></button>
            </div>
         </div>
       </div>
@@ -167,31 +173,45 @@ const Departments = () => {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-base-100 rounded-2xl w-full max-w-md border-t-8 border-primary shadow-2xl">
-            <div className="p-6 border-b flex justify-between items-center">
-              <h2 className="text-xl font-bold text-secondary flex items-center gap-2">
+          <div className="bg-base-100 dark:bg-gray-800 rounded-2xl w-full max-w-md border-t-8 border-primary shadow-2xl transition-colors">
+            <div className="p-6 border-b dark:border-gray-700 flex justify-between items-center bg-base-50 dark:bg-gray-700/50">
+              <h2 className="text-xl font-bold text-secondary dark:text-white flex items-center gap-2">
                 <FaBuilding/> {editingId ? "Edit Department" : "New Department"}
               </h2>
-              <button onClick={() => setIsModalOpen(false)} className="btn btn-circle btn-ghost btn-sm"><FaTimes/></button>
+              <button onClick={() => setIsModalOpen(false)} className="btn btn-circle btn-ghost btn-sm dark:text-gray-300 dark:hover:bg-gray-600"><FaTimes/></button>
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div className="form-control">
-                <label className="label-text font-semibold mb-1">Name <span className="text-error">*</span></label>
-                <input required className="input input-bordered" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                <label className="label-text font-semibold mb-1 dark:text-gray-300">Name <span className="text-error">*</span></label>
+                <input 
+                  required 
+                  className="input input-bordered focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white" 
+                  value={formData.name} 
+                  onChange={e => setFormData({...formData, name: e.target.value})} 
+                />
               </div>
               <div className="form-control">
-                <label className="label-text font-semibold mb-1">Code</label>
-                <input className="input input-bordered" placeholder="e.g. HR, IT, FIN" value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} />
+                <label className="label-text font-semibold mb-1 dark:text-gray-300">Code</label>
+                <input 
+                  className="input input-bordered focus:border-primary dark:bg-gray-700 dark:border-gray-600 dark:text-white" 
+                  placeholder="e.g. HR, IT, FIN" 
+                  value={formData.code} 
+                  onChange={e => setFormData({...formData, code: e.target.value})} 
+                />
               </div>
               <div className="form-control">
-                <label className="label-text font-semibold mb-1">Status</label>
-                <select className="select select-bordered" value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})}>
+                <label className="label-text font-semibold mb-1 dark:text-gray-300">Status</label>
+                <select 
+                  className="select select-bordered dark:bg-gray-700 dark:border-gray-600 dark:text-white" 
+                  value={formData.status} 
+                  onChange={e => setFormData({...formData, status: e.target.value})}
+                >
                   <option value="Active">Active</option>
                   <option value="Inactive">Inactive</option>
                 </select>
               </div>
-              <div className="flex justify-end gap-2 mt-6">
-                <button type="button" className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Cancel</button>
+              <div className="flex justify-end gap-2 mt-6 border-t dark:border-gray-700 pt-4">
+                <button type="button" className="btn btn-ghost dark:text-gray-300 dark:hover:bg-gray-700" onClick={() => setIsModalOpen(false)}>Cancel</button>
                 <button type="submit" className="btn btn-primary text-white px-8" disabled={isSubmitting}>
                   {isSubmitting ? "Processing..." : editingId ? "Update" : "Save"}
                 </button>

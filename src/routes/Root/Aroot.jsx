@@ -1,68 +1,62 @@
 // src/layouts/ARoot.js
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import Header from "./../../components/Header";
-import useThemeMode from "../../Hook/useThemeMode"; 
+import Header from "../../components/Header"; // Adjusted path based on your snippet
+import useThemeMode from "../../Hook/useThemeMode";
 
 const ARoot = () => {
+  const { mode } = useThemeMode();
 
-  const { mode } = useThemeMode(); 
-
+  // Initialize based on screen width
   const [isSidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!isSidebarOpen);
-  };
+  // ⚡ Optimization: Memoize the toggle function to prevent child re-renders
+  const toggleSidebar = useCallback(() => {
+    setSidebarOpen((prev) => !prev);
+  }, []);
 
-  // EFFECT: Handle window resizing to show/hide sidebar automatically
+  // ⚡ Optimization: Handle resize efficiently
   useEffect(() => {
     const handleResize = () => {
-      // Open on desktop, close on mobile
-      setSidebarOpen(window.innerWidth > 768);
+      // Only auto-collapse on mobile, auto-open on desktop
+      if (window.innerWidth > 768) {
+        setSidebarOpen(true);
+      } else {
+        setSidebarOpen(false);
+      }
     };
 
     window.addEventListener("resize", handleResize);
-    // Initial check
-    handleResize();
-
-    // Cleanup the event listener on component unmount
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-  
-  // 💡 Define theme-dependent classes for the main wrapper
-  const mainWrapperClasses = `
-    flex h-screen transition-colors duration-300
-    ${mode === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}
-  `;
 
-  const contentMainClasses = `
-    flex-1 flex flex-col overflow-hidden transition-all duration-300
-    ${isSidebarOpen ? "md:ml-64" : "md:ml-20"}
-  `;
-  
-  // 💡 Apply the theme classes to the top-level div
   return (
-    <div className={mainWrapperClasses}>
-      {/* Sidebar is now passed the 'mode' for internal styling */}
-      <Sidebar 
-        isSidebarOpen={isSidebarOpen} 
-        toggleSidebar={toggleSidebar} 
-        mode={mode} // 💡 Pass mode to the Sidebar
+    // 💡 1. Use 'dark:' utility classes instead of JS logic for backgrounds
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-300 text-gray-900 dark:text-gray-100">
+      
+      {/* Sidebar */}
+      <Sidebar
+        isSidebarOpen={isSidebarOpen}
+        toggleSidebar={toggleSidebar}
+        mode={mode}
       />
 
-      <div className={contentMainClasses}>
- 
+      {/* Content Wrapper */}
+      {/* 💡 2. Dynamic margin handles the layout shift */}
+      <div 
+        className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ${
+          isSidebarOpen ? "md:ml-64" : "md:ml-20"
+        }`}
+      >
         <Header 
           isSidebarOpen={isSidebarOpen} 
           toggleSidebar={toggleSidebar} 
         />
-        
-        {/* The main content area also needs theme-dependent styling */}
-        <main className={`flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6 transition-colors duration-300 
-          ${mode === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}
-        `}>
+
+        {/* Main Content */}
+        <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
           <Outlet />
         </main>
       </div>

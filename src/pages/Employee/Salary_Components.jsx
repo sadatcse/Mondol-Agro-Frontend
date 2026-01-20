@@ -101,13 +101,17 @@ const Salary_Components = () => {
   };
 
   const handleDelete = async (id) => {
+    const isDark = document.documentElement.classList.contains("dark");
+
     Swal.fire({
       title: "Confirm Delete",
       text: "This action cannot be undone.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes, Delete",
-      confirmButtonColor: "#EF4444"
+      confirmButtonColor: "#EF4444",
+      background: isDark ? "#1f2937" : "#fff",
+      color: isDark ? "#fff" : "#000",
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
@@ -122,23 +126,23 @@ const Salary_Components = () => {
   };
 
   return (
-    <div className="p-6 bg-base-200 min-h-screen">
+    <div className="p-6 bg-base-200 dark:bg-gray-900 min-h-screen transition-colors duration-300">
       {/* HEADER SECTION */}
-      <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm mb-6 border-l-8 border-primary">
+      <div className="flex flex-col md:flex-row justify-between items-center bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm mb-6 border-l-8 border-primary transition-colors">
         <div>
-          <h1 className="text-3xl font-black text-secondary flex items-center gap-2">
+          <h1 className="text-3xl font-black text-secondary dark:text-white flex items-center gap-2">
             <FaMoneyCheckAlt className="text-primary" /> Salary Components
           </h1>
-          <p className="text-neutral-500 font-medium italic text-sm">Payroll Structures & Filter Management</p>
+          <p className="text-neutral-500 dark:text-gray-400 font-medium italic text-sm">Payroll Structures & Filter Management</p>
         </div>
-        <button onClick={() => handleOpenModal()} className="btn btn-primary text-white shadow-lg">
+        <button onClick={() => handleOpenModal()} className="btn btn-primary text-white shadow-lg mt-4 md:mt-0">
           <FaPlus /> New Component
         </button>
       </div>
 
       {/* TABLE & FILTER SECTION */}
-      <div className="bg-base-100 rounded-2xl shadow-sm border border-base-300 overflow-hidden">
-        <div className="p-4 border-b space-y-4">
+      <div className="bg-base-100 dark:bg-gray-800 rounded-2xl shadow-sm border border-base-300 dark:border-gray-700 overflow-hidden transition-colors">
+        <div className="p-4 border-b dark:border-gray-700 space-y-4">
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex-1 min-w-[300px]">
                <TableControls 
@@ -150,10 +154,10 @@ const Salary_Components = () => {
             </div>
 
             {/* QUICK FILTERS */}
-            <div className="flex items-center gap-2 bg-base-200/50 p-2 rounded-xl border border-base-300">
+            <div className="flex items-center gap-2 bg-base-200/50 dark:bg-gray-700/50 p-2 rounded-xl border border-base-300 dark:border-gray-600 transition-colors">
               <FaFilter className="text-primary ml-2" />
               <select 
-                className="select select-sm select-bordered focus:outline-none"
+                className="select select-sm select-bordered focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 value={typeFilter}
                 onChange={(e) => { setTypeFilter(e.target.value); setCurrentPage(1); }}
               >
@@ -163,7 +167,7 @@ const Salary_Components = () => {
               </select>
 
               <select 
-                className="select select-sm select-bordered focus:outline-none"
+                className="select select-sm select-bordered focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 value={calcFilter}
                 onChange={(e) => { setCalcFilter(e.target.value); setCurrentPage(1); }}
               >
@@ -182,7 +186,7 @@ const Salary_Components = () => {
         {/* DATA TABLE */}
         <div className="overflow-x-auto">
           <table className="table w-full">
-            <thead className="bg-base-200/50 text-secondary uppercase text-[10px] tracking-widest">
+            <thead className="bg-base-200/50 dark:bg-gray-700/50 text-secondary dark:text-gray-200 uppercase text-[10px] tracking-widest border-b dark:border-gray-600">
               <tr>
                 <th>Component</th>
                 <th>Category</th>
@@ -195,11 +199,13 @@ const Salary_Components = () => {
             <tbody>
               {loading && components.length === 0 ? (
                 <tr><td colSpan="6"><SkeletonLoader /></td></tr>
+              ) : components.length === 0 ? (
+                <tr><td colSpan="6" className="text-center py-10 opacity-50 font-bold dark:text-gray-400">No components found.</td></tr>
               ) : (
                 components.map((comp) => (
-                  <tr key={comp._id} className="hover:bg-primary/5 transition-colors border-b">
+                  <tr key={comp._id} className="hover:bg-primary/5 dark:hover:bg-gray-700/50 transition-colors border-b dark:border-gray-700 border-base-200">
                     <td>
-                      <div className="font-bold text-secondary">{comp.name}</div>
+                      <div className="font-bold text-secondary dark:text-white">{comp.name}</div>
                       <div className="text-[10px] font-mono text-primary">{comp.code}</div>
                     </td>
                     <td>
@@ -207,21 +213,23 @@ const Salary_Components = () => {
                         {comp.type}
                       </span>
                     </td>
-                    <td className="text-xs">
-                       {comp.calculationType === 'Percentage' ? <span className="flex items-center gap-1"><FaPercent className="text-primary"/> Percentage</span> : <span className="flex items-center gap-1"><FaCoins className="text-secondary"/> Fixed Amount</span>}
+                    <td className="text-xs dark:text-gray-300">
+                       {comp.calculationType === 'Percentage' ? <span className="flex items-center gap-1"><FaPercent className="text-primary"/> Percentage</span> : <span className="flex items-center gap-1"><FaCoins className="text-secondary dark:text-gray-400"/> Fixed Amount</span>}
                     </td>
-                    <td className="font-mono font-bold">
+                    <td className="font-mono font-bold dark:text-gray-200">
                         {comp.defaultAmount}{comp.calculationType === 'Percentage' ? '%' : ''}
                     </td>
                     <td>
-                      <div className={`badge badge-sm font-bold ${comp.status === 'active' ? 'badge-primary' : 'badge-ghost'}`}>
+                      <div className={`badge badge-sm font-bold ${comp.status === 'active' ? 'badge-primary' : 'badge-ghost dark:text-gray-400'}`}>
                         {comp.status}
                       </div>
                       {comp.taxable && <span className="ml-1 badge badge-warning badge-xs">TAX</span>}
                     </td>
                     <td className="text-center">
-                      <button onClick={() => handleOpenModal(comp)} className="btn btn-sm btn-ghost text-primary"><FaEdit /></button>
-                      <button onClick={() => handleDelete(comp._id)} className="btn btn-sm btn-ghost text-error"><FaTrash /></button>
+                      <div className="flex justify-center gap-1">
+                        <button onClick={() => handleOpenModal(comp)} className="btn btn-sm btn-ghost text-primary hover:bg-primary/10"><FaEdit /></button>
+                        <button onClick={() => handleDelete(comp._id)} className="btn btn-sm btn-ghost text-error hover:bg-error/10"><FaTrash /></button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -231,12 +239,12 @@ const Salary_Components = () => {
         </div>
 
         {/* PAGINATION */}
-        <div className="p-4 flex justify-between items-center bg-base-50 border-t">
-           <span className="text-xs font-medium opacity-60">Showing {components.length} of {totalItems}</span>
+        <div className="p-4 flex flex-col md:flex-row justify-between items-center bg-base-50 dark:bg-gray-800 border-t dark:border-gray-700 transition-colors">
+           <span className="text-xs font-medium opacity-60 dark:text-gray-400 mb-2 md:mb-0">Showing {components.length} of {totalItems}</span>
            <div className="join">
-              <button disabled={currentPage === 1} className="join-item btn btn-xs" onClick={() => setCurrentPage(p => p - 1)}><FaChevronLeft/></button>
-              <button className="join-item btn btn-xs bg-white px-4">{currentPage}</button>
-              <button disabled={currentPage >= totalPages} className="join-item btn btn-xs" onClick={() => setCurrentPage(p => p + 1)}><FaChevronRight/></button>
+              <button disabled={currentPage === 1} className="join-item btn btn-xs dark:bg-gray-700 dark:text-white dark:border-gray-600" onClick={() => setCurrentPage(p => p - 1)}><FaChevronLeft/></button>
+              <button className="join-item btn btn-xs bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 px-4">{currentPage}</button>
+              <button disabled={currentPage >= totalPages} className="join-item btn btn-xs dark:bg-gray-700 dark:text-white dark:border-gray-600" onClick={() => setCurrentPage(p => p + 1)}><FaChevronRight/></button>
            </div>
         </div>
       </div>
@@ -244,59 +252,59 @@ const Salary_Components = () => {
       {/* FORM MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-base-100 rounded-3xl w-full max-w-2xl border-t-8 border-primary shadow-2xl flex flex-col max-h-[90vh]">
-            <div className="p-6 border-b flex justify-between items-center">
-              <h2 className="text-xl font-black text-secondary flex items-center gap-2">
+          <div className="bg-base-100 dark:bg-gray-800 rounded-3xl w-full max-w-2xl border-t-8 border-primary shadow-2xl flex flex-col max-h-[90vh] transition-colors">
+            <div className="p-6 border-b dark:border-gray-700 flex justify-between items-center bg-base-50 dark:bg-gray-700/50">
+              <h2 className="text-xl font-black text-secondary dark:text-white flex items-center gap-2">
                 <FaMoneyCheckAlt/> {editingId ? "Update Configuration" : "New Salary Component"}
               </h2>
-              <button onClick={() => setIsModalOpen(false)} className="btn btn-circle btn-ghost btn-sm"><FaTimes/></button>
+              <button onClick={() => setIsModalOpen(false)} className="btn btn-circle btn-ghost btn-sm dark:text-gray-300 dark:hover:bg-gray-600"><FaTimes/></button>
             </div>
             
-            <form onSubmit={handleSubmit} className="p-8 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-5">
+            <form onSubmit={handleSubmit} className="p-8 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-5 custom-scrollbar">
               <div className="form-control">
-                <label className="label-text font-bold mb-1">Name *</label>
-                <input required className="input input-bordered" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                <label className="label-text font-bold mb-1 dark:text-gray-300">Name *</label>
+                <input required className="input input-bordered dark:bg-gray-700 dark:border-gray-600 dark:text-white" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
               </div>
               <div className="form-control">
-                <label className="label-text font-bold mb-1">Code *</label>
-                <input required className="input input-bordered font-mono uppercase" value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} />
+                <label className="label-text font-bold mb-1 dark:text-gray-300">Code *</label>
+                <input required className="input input-bordered font-mono uppercase dark:bg-gray-700 dark:border-gray-600 dark:text-white" value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} />
               </div>
               <div className="form-control">
-                <label className="label-text font-bold mb-1">Type *</label>
-                <select className="select select-bordered" value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})}>
+                <label className="label-text font-bold mb-1 dark:text-gray-300">Type *</label>
+                <select className="select select-bordered dark:bg-gray-700 dark:border-gray-600 dark:text-white" value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})}>
                   <option value="Earnings">Earnings</option>
                   <option value="Deductions">Deductions</option>
                 </select>
               </div>
               <div className="form-control">
-                <label className="label-text font-bold mb-1">Calculation Method *</label>
-                <select className="select select-bordered" value={formData.calculationType} onChange={e => setFormData({...formData, calculationType: e.target.value})}>
+                <label className="label-text font-bold mb-1 dark:text-gray-300">Calculation Method *</label>
+                <select className="select select-bordered dark:bg-gray-700 dark:border-gray-600 dark:text-white" value={formData.calculationType} onChange={e => setFormData({...formData, calculationType: e.target.value})}>
                   <option value="Fixed">Fixed Amount</option>
                   <option value="Percentage">Percentage (%)</option>
                 </select>
               </div>
               <div className="form-control">
-                <label className="label-text font-bold mb-1">Value *</label>
-                <input required type="number" step="0.01" className="input input-bordered" value={formData.defaultAmount} onChange={e => setFormData({...formData, defaultAmount: Number(e.target.value)})} />
+                <label className="label-text font-bold mb-1 dark:text-gray-300">Value *</label>
+                <input required type="number" step="0.01" className="input input-bordered dark:bg-gray-700 dark:border-gray-600 dark:text-white" value={formData.defaultAmount} onChange={e => setFormData({...formData, defaultAmount: Number(e.target.value)})} />
               </div>
               <div className="form-control">
-                <label className="label-text font-bold mb-1">Status</label>
-                <select className="select select-bordered" value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})}>
+                <label className="label-text font-bold mb-1 dark:text-gray-300">Status</label>
+                <select className="select select-bordered dark:bg-gray-700 dark:border-gray-600 dark:text-white" value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})}>
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
                 </select>
               </div>
               <div className="form-control md:col-span-2">
-                <label className="label-text font-bold mb-1">Description</label>
-                <textarea className="textarea textarea-bordered h-20" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
+                <label className="label-text font-bold mb-1 dark:text-gray-300">Description</label>
+                <textarea className="textarea textarea-bordered h-20 dark:bg-gray-700 dark:border-gray-600 dark:text-white" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
               </div>
-              <div className="form-control flex-row items-center gap-2">
+              <div className="form-control flex-row items-center gap-2 md:col-span-2">
                 <input type="checkbox" className="checkbox checkbox-primary checkbox-sm" checked={formData.taxable} onChange={e => setFormData({...formData, taxable: e.target.checked})} />
-                <span className="label-text font-bold text-neutral-600">Taxable Component</span>
+                <span className="label-text font-bold text-neutral-600 dark:text-gray-300">Taxable Component</span>
               </div>
-              <div className="md:col-span-2 flex justify-end gap-3 mt-6 pt-6 border-t">
-                <button type="button" className="btn btn-ghost" onClick={() => setIsModalOpen(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary px-12 text-white" disabled={isSubmitting}>
+              <div className="md:col-span-2 flex justify-end gap-3 mt-6 pt-6 border-t dark:border-gray-700">
+                <button type="button" className="btn btn-ghost dark:text-gray-300 dark:hover:bg-gray-700" onClick={() => setIsModalOpen(false)}>Cancel</button>
+                <button type="submit" className="btn btn-primary px-12 text-white shadow-lg" disabled={isSubmitting}>
                   <FaSave className="mr-1" /> {isSubmitting ? "Saving..." : "Save Component"}
                 </button>
               </div>

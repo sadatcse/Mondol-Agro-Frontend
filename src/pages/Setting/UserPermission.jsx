@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import menuItems from "../../routes/Root/MenuItems"; 
 import UseAxiosSecure from "../../Hook/UseAxioSecure";
 import toast from "react-hot-toast";
@@ -24,12 +24,11 @@ const PermissionItem = ({ item, groupName, role, initialChecked, onPermissionCha
         setIsChecked(checked); 
         setIsUpdating(true);
 
-        // 🟢 LOGIC CHANGE: If groupName is missing, send null or empty string
         const permissionPayload = {
             title: item.title, 
             isAllowed: checked, 
             role,
-            group_name: groupName || null, // Stores as NULL in DB if no group
+            group_name: groupName || null, 
             path: item.path, 
         };
         
@@ -46,10 +45,15 @@ const PermissionItem = ({ item, groupName, role, initialChecked, onPermissionCha
     };
 
     return (
-        <div className={`form-control p-3 rounded-xl border transition-all duration-200 ${isChecked ? 'bg-primary/5 border-primary/30' : 'bg-white border-base-200 hover:border-primary/20'}`}>
+        <div className={`form-control p-3 rounded-xl border transition-all duration-200 
+            ${isChecked 
+                ? 'bg-primary/5 border-primary/30 dark:bg-primary/10 dark:border-primary/30' 
+                : 'bg-white border-base-200 hover:border-primary/20 dark:bg-gray-700/50 dark:border-gray-600 dark:hover:border-gray-500'
+            }`}>
             <label className={`cursor-pointer label justify-between py-0 ${isUpdating ? 'opacity-50 pointer-events-none' : ''}`}>
-                <span className={`label-text font-semibold text-sm flex items-center gap-2 ${isChecked ? 'text-secondary' : 'text-neutral-600'}`}>
-                    {isChecked ? <FaCheckCircle className="text-primary text-xs"/> : <FaLock className="text-neutral-300 text-xs"/>}
+                <span className={`label-text font-semibold text-sm flex items-center gap-2 transition-colors
+                    ${isChecked ? 'text-secondary dark:text-white' : 'text-neutral-600 dark:text-gray-300'}`}>
+                    {isChecked ? <FaCheckCircle className="text-primary text-xs"/> : <FaLock className="text-neutral-300 dark:text-gray-500 text-xs"/>}
                     {item.title}
                 </span>
                 
@@ -98,31 +102,34 @@ const UserPermission = () => {
         return permission ? permission.isAllowed : false;
     };
 
-    const allMenuItems = typeof menuItems === 'function' ? menuItems() : menuItems;
+    // Optimization: Memoize menu items to prevent calculation on every render
+    const allMenuItems = useMemo(() => {
+        return typeof menuItems === 'function' ? menuItems() : menuItems;
+    }, []);
 
     return (
-        <div className="p-4 sm:p-6 lg:p-8 bg-base-200 min-h-screen">
-            {/* HEADER SECTION (Same as before) */}
-            <div className="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-sm mb-6 border-l-8 border-primary">
+        <div className="p-4 sm:p-6 lg:p-8 bg-base-200 dark:bg-gray-900 min-h-screen transition-colors duration-300">
+            {/* HEADER SECTION */}
+            <div className="flex flex-col md:flex-row justify-between items-center bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm mb-6 border-l-8 border-primary transition-colors">
                 <div>
-                    <h1 className="text-3xl font-black text-secondary flex items-center gap-2">
+                    <h1 className="text-3xl font-black text-secondary dark:text-white flex items-center gap-2">
                         <FaUserShield className="text-primary" /> Access Control
                     </h1>
-                    <p className="text-neutral-500 font-medium font-sans">Manage Role-Based Access</p>
+                    <p className="text-neutral-500 dark:text-gray-400 font-medium font-sans">Manage Role-Based Access</p>
                 </div>
             </div>
 
-            <div className="bg-base-100 rounded-2xl shadow-sm border border-base-300 overflow-hidden">
-                {/* ROLE SELECTOR (Same as before) */}
-                <div className="p-6 bg-base-50 border-b border-base-200 flex flex-col md:flex-row items-center gap-4">
+            <div className="bg-base-100 dark:bg-gray-800 rounded-2xl shadow-sm border border-base-300 dark:border-gray-700 overflow-hidden transition-colors">
+                {/* ROLE SELECTOR */}
+                <div className="p-6 bg-base-50 dark:bg-gray-700/30 border-b border-base-200 dark:border-gray-700 flex flex-col md:flex-row items-center gap-4">
                      <div className="form-control w-full max-w-sm">
                         <label className="label py-1">
-                            <span className="label-text font-bold text-secondary flex items-center gap-2">
+                            <span className="label-text font-bold text-secondary dark:text-gray-200 flex items-center gap-2">
                                 <FaKey className="text-primary" /> Select Role
                             </span>
                         </label>
                         <select
-                            className="select select-bordered focus:border-primary w-full shadow-sm"
+                            className="select select-bordered focus:border-primary w-full shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                             value={role}
                             onChange={(e) => setRole(e.target.value)}
                         >
@@ -149,13 +156,13 @@ const UserPermission = () => {
                                 if (isGroup) {
                                     // 🟢 RENDER 1: IT IS A GROUP (Folder)
                                     return (
-                                        <div key={index} className="flex flex-col h-auto bg-white rounded-2xl border border-base-200 shadow-sm">
+                                        <div key={index} className="flex flex-col h-auto bg-white dark:bg-gray-800 rounded-2xl border border-base-200 dark:border-gray-700 shadow-sm transition-colors">
                                             {/* Group Header */}
-                                            <div className="p-4 border-b border-base-100 bg-base-50/50 rounded-t-2xl flex items-center gap-3">
+                                            <div className="p-4 border-b border-base-100 dark:border-gray-700 bg-base-50/50 dark:bg-gray-700/50 rounded-t-2xl flex items-center gap-3">
                                                 <div className="text-primary text-lg">
                                                     {menuItem.icon || <FaLayerGroup />}
                                                 </div>
-                                                <h3 className="font-bold text-secondary uppercase tracking-wide text-sm">
+                                                <h3 className="font-bold text-secondary dark:text-gray-200 uppercase tracking-wide text-sm">
                                                     {menuItem.title}
                                                 </h3>
                                             </div>
@@ -165,7 +172,7 @@ const UserPermission = () => {
                                                     <PermissionItem
                                                         key={sub.path || subIndex} 
                                                         item={sub} 
-                                                        groupName={menuItem.title} // Send Group Name
+                                                        groupName={menuItem.title} 
                                                         role={role} 
                                                         initialChecked={isRouteAllowed(sub.path)}
                                                         onPermissionChange={fetchPermissions}
@@ -176,14 +183,13 @@ const UserPermission = () => {
                                     );
                                 } else {
                                     // 🟢 RENDER 2: IT IS A STANDALONE ITEM (Individual)
-                                    // We render it in a card, but visually distinctive (or simpler)
                                     return (
-                                        <div key={index} className="flex flex-col h-auto bg-white rounded-2xl border border-base-200 shadow-sm hover:border-primary/40 transition-colors">
-                                             <div className="p-4 border-b border-base-100 bg-white rounded-t-2xl flex items-center gap-3">
-                                                <div className="text-secondary text-lg">
+                                        <div key={index} className="flex flex-col h-auto bg-white dark:bg-gray-800 rounded-2xl border border-base-200 dark:border-gray-700 shadow-sm hover:border-primary/40 dark:hover:border-primary/40 transition-colors">
+                                             <div className="p-4 border-b border-base-100 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-t-2xl flex items-center gap-3">
+                                                <div className="text-secondary dark:text-gray-300 text-lg">
                                                     {menuItem.icon || <FaLink />}
                                                 </div>
-                                                <h3 className="font-bold text-neutral-600 uppercase tracking-wide text-xs">
+                                                <h3 className="font-bold text-neutral-600 dark:text-gray-400 uppercase tracking-wide text-xs">
                                                     Individual Access
                                                 </h3>
                                             </div>
@@ -191,7 +197,7 @@ const UserPermission = () => {
                                                 <PermissionItem
                                                     key={menuItem.path || index} 
                                                     item={menuItem} 
-                                                    groupName={null} // 🟢 SEND NULL/EMPTY GROUP
+                                                    groupName={null} 
                                                     role={role} 
                                                     initialChecked={isRouteAllowed(menuItem.path)}
                                                     onPermissionChange={fetchPermissions}

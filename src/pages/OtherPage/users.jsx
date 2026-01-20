@@ -101,20 +101,20 @@ const Users = () => {
   };
 
   return (
-    <div className="p-6 bg-base-200 min-h-screen">
+    <div className="p-6 bg-base-200 dark:bg-gray-900 min-h-screen transition-colors duration-300">
       {/* HEADER SECTION */}
-      <div className="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm mb-6 border-l-8 border-primary">
+      <div className="flex justify-between items-center bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm mb-6 border-l-8 border-primary transition-colors">
         <div>
-          <h1 className="text-3xl font-black text-secondary flex items-center gap-2">
+          <h1 className="text-3xl font-black text-secondary dark:text-white flex items-center gap-2">
             <FaUserShield className="text-primary" /> Admin Panel
           </h1>
-          <p className="text-neutral-500 font-medium text-sm">User Management & Password Overrides</p>
+          <p className="text-neutral-500 dark:text-gray-400 font-medium text-sm">User Management & Password Overrides</p>
         </div>
       </div>
 
       {/* TABLE SECTION */}
-      <div className="bg-base-100 rounded-2xl shadow-sm border border-base-300 overflow-hidden">
-        <div className="p-4 border-b">
+      <div className="bg-base-100 dark:bg-gray-800 rounded-2xl shadow-sm border border-base-300 dark:border-gray-700 overflow-hidden transition-colors">
+        <div className="p-4 border-b dark:border-gray-700 bg-base-50/50 dark:bg-gray-700/30">
           <TableControls 
             itemsPerPage={itemsPerPage} 
             onItemsPerPageChange={(e) => { setItemsPerPage(e.target.value); setCurrentPage(1); }} 
@@ -125,7 +125,7 @@ const Users = () => {
 
         <div className="overflow-x-auto">
           <table className="table w-full">
-            <thead className="bg-base-200/50 text-secondary uppercase text-[10px] tracking-widest">
+            <thead className="bg-base-200/50 dark:bg-gray-700/50 text-secondary dark:text-gray-200 uppercase text-[10px] tracking-widest border-b dark:border-gray-600">
               <tr>
                 <th>User Details</th>
                 <th>Role</th>
@@ -139,35 +139,35 @@ const Users = () => {
                 <tr><td colSpan="5"><SkeletonLoader /></td></tr>
               ) : (
                 users.map((u) => (
-                  <tr key={u._id} className="hover:bg-primary/5 transition-colors border-b last:border-0">
+                  <tr key={u._id} className="hover:bg-primary/5 dark:hover:bg-gray-700/50 transition-colors border-b dark:border-gray-700 last:border-0">
                     <td>
                       <div className="flex items-center gap-3">
                         <div className="avatar placeholder">
-                          <div className="bg-neutral text-neutral-content rounded-full w-8 text-xs font-bold">
+                          <div className="bg-neutral text-neutral-content rounded-full w-8 text-xs font-bold dark:bg-gray-600 dark:text-gray-200">
                             <span>{u.email.charAt(0).toUpperCase()}</span>
                           </div>
                         </div>
                         <div>
-                          <div className="font-bold text-secondary text-sm">{u.email}</div>
-                          <div className="text-[10px] font-mono text-primary flex items-center gap-1 uppercase">
+                          <div className="font-bold text-secondary dark:text-white text-sm">{u.email}</div>
+                          <div className="text-[10px] font-mono text-primary dark:text-primary/80 flex items-center gap-1 uppercase">
                              ID: {u._id.slice(-6)}
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td><span className="badge badge-sm badge-outline uppercase text-[10px] font-bold">{u.role}</span></td>
+                    <td><span className="badge badge-sm badge-outline uppercase text-[10px] font-bold dark:border-gray-500 dark:text-gray-300">{u.role}</span></td>
                     <td>
-                      <div className={`badge badge-sm gap-1 font-bold text-[10px] ${u.status === 'active' ? 'badge-success' : 'badge-ghost'}`}>
+                      <div className={`badge badge-sm gap-1 font-bold text-[10px] ${u.status === 'active' ? 'badge-success text-white' : 'badge-ghost dark:text-gray-400'}`}>
                         <FaCircle size={6} /> {u.status.toUpperCase()}
                       </div>
                     </td>
-                    <td className="text-xs opacity-70">{new Date(u.createdAt).toLocaleDateString()}</td>
+                    <td className="text-xs opacity-70 dark:text-gray-400">{new Date(u.createdAt).toLocaleDateString()}</td>
                     <td className="text-center">
                       <div className="flex justify-center gap-1">
-                        <button onClick={() => handleOpenEdit(u)} className="btn btn-sm btn-ghost text-primary" title="Edit Profile">
+                        <button onClick={() => handleOpenEdit(u)} className="btn btn-sm btn-ghost text-primary hover:bg-primary/10 dark:hover:bg-blue-900/30" title="Edit Profile">
                           <FaEdit />
                         </button>
-                        <button onClick={() => handleOpenPassword(u)} className="btn btn-sm btn-ghost text-orange-500" title="Reset Password">
+                        <button onClick={() => handleOpenPassword(u)} className="btn btn-sm btn-ghost text-orange-500 hover:bg-orange-500/10 dark:hover:bg-orange-900/30" title="Reset Password">
                           <FaKey />
                         </button>
                       </div>
@@ -180,14 +180,14 @@ const Users = () => {
         </div>
 
         {/* PAGINATION */}
-        <div className="p-4 flex justify-between items-center bg-base-50/50 border-t">
-           <span className="text-xs font-medium opacity-60">Results: {totalItems}</span>
-           <div className="join">
-              <button className="join-item btn btn-xs" onClick={() => setCurrentPage(p => Math.max(1, p-1))} disabled={currentPage === 1}>
+        <div className="p-4 flex justify-between items-center bg-base-50/50 dark:bg-gray-800 border-t dark:border-gray-700 transition-colors">
+           <span className="text-xs font-medium opacity-60 dark:text-gray-400">Results: {totalItems}</span>
+           <div className="join gap-1">
+              <button className="join-item btn btn-xs dark:bg-gray-700 dark:text-white dark:border-gray-600" onClick={() => setCurrentPage(p => Math.max(1, p-1))} disabled={currentPage === 1}>
                 <FaChevronLeft/>
               </button>
-              <button className="join-item btn btn-xs bg-white pointer-events-none px-4">Page {currentPage}</button>
-              <button className="join-item btn btn-xs" onClick={() => setCurrentPage(p => p+1)} disabled={currentPage >= totalPages}>
+              <button className="join-item btn btn-xs bg-white dark:bg-gray-700 dark:text-white dark:border-gray-600 px-4 pointer-events-none">Page {currentPage}</button>
+              <button className="join-item btn btn-xs dark:bg-gray-700 dark:text-white dark:border-gray-600" onClick={() => setCurrentPage(p => p+1)} disabled={currentPage >= totalPages}>
                 <FaChevronRight/>
               </button>
            </div>
@@ -202,35 +202,35 @@ const Users = () => {
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="bg-base-100 rounded-3xl w-full max-w-md overflow-hidden flex flex-col border-t-8 border-primary shadow-2xl"
+              className="bg-base-100 dark:bg-gray-800 rounded-3xl w-full max-w-md overflow-hidden flex flex-col border-t-8 border-primary shadow-2xl transition-colors"
             >
-              <div className="p-6 border-b flex justify-between items-center bg-base-50">
-                <h2 className="text-xl font-black text-secondary flex items-center gap-2"> 
+              <div className="p-6 border-b dark:border-gray-700 flex justify-between items-center bg-base-50 dark:bg-gray-700/50">
+                <h2 className="text-xl font-black text-secondary dark:text-white flex items-center gap-2"> 
                   {modalMode === "edit" ? <FaUserShield className="text-primary"/> : <FaLock className="text-orange-500"/>}
                   {modalMode === "edit" ? "Edit Permissions" : "Reset User Password"}
                 </h2>
-                <button onClick={() => setIsModalOpen(false)} className="btn btn-circle btn-ghost btn-sm"><FaTimes/></button>
+                <button onClick={() => setIsModalOpen(false)} className="btn btn-circle btn-ghost btn-sm dark:text-gray-300 dark:hover:bg-gray-600"><FaTimes/></button>
               </div>
 
               <form onSubmit={handleSubmit} className="p-8 space-y-4">
                 {modalMode === "edit" ? (
                   <>
                     <div className="form-control">
-                      <label className="label-text font-bold mb-1">Target Account</label>
-                      <input type="email" disabled className="input input-bordered bg-base-200" value={formData.email} />
+                      <label className="label-text font-bold mb-1 dark:text-gray-300">Target Account</label>
+                      <input type="email" disabled className="input input-bordered bg-base-200 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400" value={formData.email} />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="form-control">
-                        <label className="label-text font-bold mb-1">Access Role</label>
-                        <select className="select select-bordered" value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})}>
+                        <label className="label-text font-bold mb-1 dark:text-gray-300">Access Role</label>
+                        <select className="select select-bordered dark:bg-gray-700 dark:border-gray-600 dark:text-white" value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})}>
                           <option value="user">User</option>
                           <option value="manager">Manager</option>
                           <option value="admin">Admin</option>
                         </select>
                       </div>
                       <div className="form-control">
-                        <label className="label-text font-bold mb-1">Account Status</label>
-                        <select className="select select-bordered" value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})}>
+                        <label className="label-text font-bold mb-1 dark:text-gray-300">Account Status</label>
+                        <select className="select select-bordered dark:bg-gray-700 dark:border-gray-600 dark:text-white" value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})}>
                           <option value="active">Active</option>
                           <option value="inactive">Inactive</option>
                         </select>
@@ -239,17 +239,17 @@ const Users = () => {
                   </>
                 ) : (
                   <>
-                    <div className="bg-orange-50 p-3 rounded-lg border border-orange-100 mb-2">
-                        <p className="text-[11px] text-orange-700 font-medium">
+                    <div className="bg-orange-50 dark:bg-orange-900/30 p-3 rounded-lg border border-orange-100 dark:border-orange-800 mb-2">
+                        <p className="text-[11px] text-orange-700 dark:text-orange-300 font-medium">
                             As an admin, you are performing a forced password reset. The user will be required to use this new password immediately.
                         </p>
                     </div>
                     <div className="form-control">
-                      <label className="label-text font-bold mb-1">Set New Password</label>
+                      <label className="label-text font-bold mb-1 dark:text-gray-300">Set New Password</label>
                       <input 
-                        type="text" // Admin can see what they are typing for clarity, or change to "password"
+                        type="text" 
                         required 
-                        className="input input-bordered" 
+                        className="input input-bordered dark:bg-gray-700 dark:border-gray-600 dark:text-white" 
                         placeholder="Enter secure password"
                         value={pwData.newPassword} 
                         onChange={e => setPwData({...pwData, newPassword: e.target.value})}
@@ -259,18 +259,18 @@ const Users = () => {
                           {[1, 2, 3, 4].map((step) => (
                             <div 
                               key={step} 
-                              className={`flex-1 rounded-full transition-all ${step <= calculateStrength(pwData.newPassword) ? strengthColors[calculateStrength(pwData.newPassword)-1] : "bg-base-300"}`}
+                              className={`flex-1 rounded-full transition-all ${step <= calculateStrength(pwData.newPassword) ? strengthColors[calculateStrength(pwData.newPassword)-1] : "bg-base-300 dark:bg-gray-600"}`}
                             />
                           ))}
                         </div>
                       </div>
                     </div>
                     <div className="form-control">
-                      <label className="label-text font-bold mb-1">Confirm New Password</label>
+                      <label className="label-text font-bold mb-1 dark:text-gray-300">Confirm New Password</label>
                       <input 
                         type="text" 
                         required 
-                        className={`input input-bordered ${pwData.confirmPassword && pwData.newPassword !== pwData.confirmPassword ? "input-error" : ""}`} 
+                        className={`input input-bordered dark:bg-gray-700 dark:border-gray-600 dark:text-white ${pwData.confirmPassword && pwData.newPassword !== pwData.confirmPassword ? "input-error" : ""}`} 
                         value={pwData.confirmPassword} 
                         onChange={e => setPwData({...pwData, confirmPassword: e.target.value})}
                       />
@@ -281,9 +281,9 @@ const Users = () => {
                   </>
                 )}
 
-                <div className="pt-6 flex justify-end gap-2">
-                  <button type="button" className="btn btn-ghost btn-sm" onClick={() => setIsModalOpen(false)}>Discard</button>
-                  <button type="submit" className="btn btn-primary px-10 text-white btn-sm gap-2" disabled={isSubmitting}>
+                <div className="pt-6 flex justify-end gap-2 border-t dark:border-gray-700 mt-4">
+                  <button type="button" className="btn btn-ghost btn-sm dark:text-gray-300 dark:hover:bg-gray-700" onClick={() => setIsModalOpen(false)}>Discard</button>
+                  <button type="submit" className="btn btn-primary px-10 text-white btn-sm gap-2 shadow-lg" disabled={isSubmitting}>
                     {isSubmitting ? <span className="loading loading-spinner loading-xs"></span> : <FaSave />}
                     {modalMode === "edit" ? "Save Changes" : "Apply Reset"}
                   </button>

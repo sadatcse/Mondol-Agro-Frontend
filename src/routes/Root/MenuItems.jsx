@@ -363,6 +363,15 @@ const menuItems = () => {
           path: "/dashboard/setting/expensecategory",
           icon: <MdPayments className="text-base" />,
         },
+          {
+          title: " Activity Log",
+          path: "/dashboard/setting/activitylog",
+          icon: <MdPayments className="text-base" />,
+        },
+
+
+
+       
       ],
     },
   ];
