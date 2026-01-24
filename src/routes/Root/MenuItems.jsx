@@ -349,7 +349,7 @@ const menuItems = () => {
           icon: <MdPayments className="text-base" />,
         },
           {
-          title: "User Permission",
+          title: "Access Control",
           path: "/dashboard/setting/permission",
           icon: <MdPayments className="text-base" />,
         },

@@ -1,11 +1,11 @@
 import React from 'react';
 
-const transfers = () => {
+const Transfers = () => {
     return (
         <div>
-            
+             <h1>Transfers</h1>
         </div>
     );
 };
 
-export default transfers;
+export default Transfers;

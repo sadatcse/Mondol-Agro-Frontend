@@ -43,6 +43,34 @@ import UserPermission from "../pages/Setting/UserPermission";
 import PaymentType from "../pages/Setting/PaymentType";
 import ExpenseCategory from "../pages/Setting/ExpenseCategory";
 import ActivityLog from "../pages/Setting/ActivityLog";
+import Warehouses from "../pages/Inventory/Warehouses";
+import Transfers from "../pages/Inventory/Transfers";
+import Inventory from "../pages/Inventory/Inventory";
+import Ledger from "../pages/Clients/Ledger";
+import Payments from "../pages/Clients/Payments";
+
+
+import VendorList from "../pages/Vendor/VendorList";
+import VendorPurchases from "../pages/Vendor/VendorPurchases";
+import VendorPayments from "../pages/Vendor/VendorPayments";
+import VendorLedger from "../pages/Vendor/VendorLedger";
+import ProjectPayments from "../pages/Projects/ProjectPayments";
+import ProjectLedger from "../pages/Projects/ProjectLedger";
+import Hrletters from "../pages/Employee/Hrletters";
+
+import Hrperformance from "../pages/Employee/Hrperformance";
+import Hrsalarytransfer from "../pages/Employee/Hrsalarytransfer";
+import Companypurchases from "../pages/Company/Companypurchases";
+import Companybalancesheet from "../pages/Company/Companybalancesheet";
+import Companyexpenses from "../pages/Company/Companyexpenses";
+import Chartofaccounts from "../pages/Finance/Chartofaccounts";
+import Capital from "../pages/Finance/Capital";
+import Loans from "../pages/Finance/Loans";
+import Profitloss from "../pages/Finance/Profitloss";
+import Balancesheet from "../pages/Finance/Balancesheet";
+import Cashflow from "../pages/Finance/Cashflow";
+
+
 
 export const router = createBrowserRouter([
   {
@@ -101,27 +129,27 @@ export const router = createBrowserRouter([
       // ================= FINANCE & ACCOUNTING (New Placeholders) =================
       {
         path: "finance/chart-of-accounts",
-        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
+        element: <PrivateRoot><Chartofaccounts /></PrivateRoot>, // Placeholder
       },
       {
         path: "finance/capital",
-        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
+        element: <PrivateRoot><Capital /></PrivateRoot>, // Placeholder
       },
       {
         path: "finance/loans",
-        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
+        element: <PrivateRoot><Loans /></PrivateRoot>, // Placeholder
       },
       {
         path: "finance/profit-loss",
-        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
+        element: <PrivateRoot><Profitloss /></PrivateRoot>, // Placeholder
       },
       {
         path: "finance/balance-sheet",
-        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
+        element: <PrivateRoot><Balancesheet /></PrivateRoot>, // Placeholder
       },
       {
         path: "finance/cash-flow",
-        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
+        element: <PrivateRoot><Cashflow /></PrivateRoot>, // Placeholder
       },
 
       // ================= CASH =================
@@ -141,15 +169,15 @@ export const router = createBrowserRouter([
       },
       {
         path: "company/balance-sheet",
-        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
+        element: <PrivateRoot><Companybalancesheet /></PrivateRoot>, // Placeholder
       },
       {
         path: "company/expenses",
-        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
+        element: <PrivateRoot><Companyexpenses /></PrivateRoot>, // Placeholder
       },
       {
         path: "company/purchases",
-        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
+        element: <PrivateRoot><Companypurchases /></PrivateRoot>, // Placeholder
       },
 
       // ================= EMPLOYEE (HR/Admin) =================
@@ -175,15 +203,15 @@ export const router = createBrowserRouter([
       },
       {
         path: "hr/letters",
-        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
+        element: <PrivateRoot><Hrletters /></PrivateRoot>, 
       },
       {
         path: "hr/performance",
-        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
+        element: <PrivateRoot><Hrperformance /></PrivateRoot>, 
       },
       {
         path: "hr/salary-transfer",
-        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
+        element: <PrivateRoot><Hrsalarytransfer /></PrivateRoot>,
       },
 
       // ================= PROJECTS =================
@@ -193,29 +221,29 @@ export const router = createBrowserRouter([
       },
       {
         path: "projects/payments",
-        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
+        element: <PrivateRoot><ProjectPayments /></PrivateRoot>, 
       },
       {
         path: "projects/ledger",
-        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
+        element: <PrivateRoot><ProjectLedger /></PrivateRoot>, 
       },
 
       // ================= VENDORS =================
       {
         path: "vendor",
-        element: <PrivateRoot><Vendor /></PrivateRoot>,
+        element: <PrivateRoot><VendorList /></PrivateRoot>,
       },
       {
         path: "vendors/purchases",
-        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
+        element: <PrivateRoot><VendorPurchases /></PrivateRoot>, 
       },
       {
         path: "vendors/payments",
-        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
+        element: <PrivateRoot><VendorPayments /></PrivateRoot>, 
       },
       {
         path: "vendors/ledger",
-        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
+        element: <PrivateRoot><VendorLedger /></PrivateRoot>,
       },
 
       // ================= CLIENTS =================
@@ -225,25 +253,25 @@ export const router = createBrowserRouter([
       },
       {
         path: "clients/payments",
-        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
+        element: <PrivateRoot><Payments /></PrivateRoot>, 
       },
       {
         path: "clients/ledger",
-        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
+        element: <PrivateRoot><Ledger /></PrivateRoot>, 
       },
 
       // ================= INVENTORY & STOCK (New Placeholders) =================
       {
         path: "inventory",
-        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
+        element: <PrivateRoot><Inventory /></PrivateRoot>, 
       },
       {
         path: "inventory/transfers",
-        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
+        element: <PrivateRoot><Transfers /></PrivateRoot>, 
       },
       {
         path: "inventory/warehouses",
-        element: <PrivateRoot><UserPermission /></PrivateRoot>, // Placeholder
+        element: <PrivateRoot><Warehouses/></PrivateRoot>, 
       },
 
       // ================= REPORTS =================
@@ -294,14 +322,6 @@ export const router = createBrowserRouter([
         element: <PrivateRoot><ActivityLog /></PrivateRoot>,
       },
 
-      
-
-
-      
-
-
-
-      
     ],
   },
 ]);

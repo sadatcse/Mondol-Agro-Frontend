@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ledger = () => {
+const Ledger = () => {
     return (
         <div>
             
@@ -8,4 +8,4 @@ const ledger = () => {
     );
 };
 
-export default ledger;
+export default Ledger;
