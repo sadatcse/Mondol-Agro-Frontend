@@ -185,6 +185,11 @@ const menuItems = () => {
           icon: <MdGroup className="text-lg" />,
         },
         {
+          title: "Employee Advances",
+          path: "/dashboard/advances",
+          icon: <MdGroup className="text-lg" />,
+        },
+        {
           title: "Employee Letters (AI)",
           path: "/dashboard/hr/letters",
           icon: <MdFolderShared className="text-base" />,

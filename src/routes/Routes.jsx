@@ -69,6 +69,7 @@ import Loans from "../pages/Finance/Loans";
 import Profitloss from "../pages/Finance/Profitloss";
 import Balancesheet from "../pages/Finance/Balancesheet";
 import Cashflow from "../pages/Finance/Cashflow";
+import EmployeeAdvances from "../pages/Employee/EmployeeAdvances";
 
 
 
@@ -197,6 +198,14 @@ export const router = createBrowserRouter([
         path: "employee/payroll",
         element: <PrivateRoot><Payroll /></PrivateRoot>,
       },
+          {
+        path: "advances",
+        element: <PrivateRoot><EmployeeAdvances /></PrivateRoot>,
+      },
+
+
+
+      
       {
         path: "users",
         element: <PrivateRoot><Users /></PrivateRoot>,
